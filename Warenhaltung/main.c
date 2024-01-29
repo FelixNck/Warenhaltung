@@ -13,7 +13,7 @@ void bs_loeschen();
 
 
 
-// Beispiel
+/* Beispiel
 
 // id_20 => 2018000
 // id_40 => 4054000
@@ -76,7 +76,7 @@ struct Artikel {
     int positions_id = [3, 4]
 };
 
-
+*/
 
 // Hier geht der richtige Code los
 
@@ -137,9 +137,9 @@ int neuen_artikel_anlegen() {
     int wahl = 0;
 
     bs_loeschen();
-    printf("(0) Nein");
+    printf("Neuen Artikel anlegen?");
     printf("\n(1) Ja");
-    printf("\nNeuen Artikel anlegen?");
+    printf("\n(0) Nein");
     printf("\n");
     
     scanf("%d", &janein);
@@ -149,35 +149,44 @@ int neuen_artikel_anlegen() {
     }
 
     bs_loeschen();
-    printf("Artikel Name:");
-    fflush(stdin);
-    wahl = getchar();
-    fflush(stdin);
+    printf("Neuen Artikel anlegen");
+
+    printf("\n");
+    printf("\nArtikelname (max. 100 Zeichen):");
+    // input für artikelname auslesen
 
     printf("\nArtikel Nummer:");
-    fflush(stdin);
-    wahl = getchar();
-    fflush(stdin);
+    // input für artikel nummer auslesen
 
-    printf("\nArtikel Preis:");
-    fflush(stdin);
-    wahl = getchar();
-    fflush(stdin);
+    printf("\nPreis (in EUR):");
+    // input für artikel preis auslesen
 
-    printf("\nArtikel Hoehe:");
-    fflush(stdin);
-    wahl = getchar();
-    fflush(stdin);
+    printf("\nHoehe (in cm):");
+    // input für hoehe auslesen
 
-    printf("\nArtikel Breite:");
-    fflush(stdin);
-    wahl = getchar();
-    fflush(stdin);
+    printf("\nBreite (in cm):");
+    // input für breite auslesen
 
-    printf("\nArtikel Tiefe:");
-    fflush(stdin);
-    wahl = getchar();
-    fflush(stdin);
+    printf("\nTiefe (in cm):");
+    // input für tiefe auslesen
+
+    getchar();
+    getchar();
+
+    bs_loeschen();
+
+    // anzeigen des erstellten Artikels so umbauen, dass User Inputs richtig ausgegeben werden
+    // Vielleicht auch in artikel_anzeigen() Funktion bauen?
+    printf("Artikel wurde erfolgreich angelegt. Druecke Enter, um zum Menue zu kommen!");
+    printf("\n");
+    printf("\nArtikel Name: Katzenfutter Bio 100g");
+    printf("\nArtikel Nummer: 123456789");
+    printf("\nArtikel Preis: 3,50");
+    printf("\nArtikel Hoehe (in cm): 10");
+    printf("\nArtikel Breite (in cm): 15");
+    printf("\nArtikel Tiefe (in cm): 10");
+
+    getchar();
 
     return 0;
 }
