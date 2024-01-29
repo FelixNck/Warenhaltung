@@ -59,17 +59,17 @@ if (hohe <= 20) {
 }
 
 
-
+*/
 
 struct ArtikelTyp {
-    char name[100] = Katzenfutter Bio 100g
-    int art_nummer = 12345
-    int preis = 10
-    int hoehe = 10
-    int breite = 20
-    int tiefe = 10
+    char name[100];
+    int art_nummer;
+    double preis;
+    double hoehe;
+    double breite;
+    double tiefe;
 };
-
+/*
 struct Artikel {
     int artikel_typ_nummer = 12345
     int inventarnummer = 9785
@@ -132,6 +132,9 @@ int menue() { //hier wird das Menue ausgegeben
 }
 
 int neuen_artikel_anlegen() {
+
+    struct ArtikelTyp artikeltyp;
+
     int janein = 0;
 
     int wahl = 0;
@@ -153,22 +156,30 @@ int neuen_artikel_anlegen() {
 
     printf("\n");
     printf("\nArtikelname (max. 100 Zeichen):");
+
     // input für artikelname auslesen
+    scanf("%s", artikeltyp.name);
 
     printf("\nArtikel Nummer:");
     // input für artikel nummer auslesen
+    scanf("%d", &artikeltyp.art_nummer);
 
     printf("\nPreis (in EUR):");
     // input für artikel preis auslesen
+    scanf("%lf", &artikeltyp.preis);
 
     printf("\nHoehe (in cm):");
     // input für hoehe auslesen
+    scanf("%lf", &artikeltyp.hoehe);
 
     printf("\nBreite (in cm):");
     // input für breite auslesen
+    scanf("%lf", &artikeltyp.breite);
 
     printf("\nTiefe (in cm):");
     // input für tiefe auslesen
+    scanf("%lf", &artikeltyp.tiefe);
+
 
     getchar();
     getchar();
@@ -179,12 +190,12 @@ int neuen_artikel_anlegen() {
     // Vielleicht auch in artikel_anzeigen() Funktion bauen?
     printf("Artikel wurde erfolgreich angelegt. Druecke Enter, um zum Menue zu kommen!");
     printf("\n");
-    printf("\nArtikel Name: Katzenfutter Bio 100g");
-    printf("\nArtikel Nummer: 123456789");
-    printf("\nArtikel Preis: 3,50");
-    printf("\nArtikel Hoehe (in cm): 10");
-    printf("\nArtikel Breite (in cm): 15");
-    printf("\nArtikel Tiefe (in cm): 10");
+    printf("\nArtikel Name: %s", artikeltyp.name);
+    printf("\nArtikel Nummer: %d", artikeltyp.art_nummer);
+    printf("\nArtikel Preis: %.2lf", artikeltyp.preis);
+    printf("\nArtikel Hoehe (in cm): %.2lf", artikeltyp.hoehe);
+    printf("\nArtikel Breite (in cm): %.2lf", artikeltyp.breite);
+    printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp.tiefe);
 
     getchar();
 
