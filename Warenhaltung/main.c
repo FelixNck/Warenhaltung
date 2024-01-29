@@ -1,8 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main() {
-    printf("\nHalle                 Porta Westfalica");
+int menue();
+int neuen_artikel_anlegen();
+void bs_loeschen();
+
+int main(void) {
+    int auswahl;
+
+    while (1) {
+        menue();
+
+        scanf("%d", &auswahl);
+
+        switch (auswahl) {
+        case 1:
+            neuen_artikel_anlegen();
+            break;
+        default:
+            printf("\nFalsche eingabe. Waehle eine der oben aufgelisteten Moeglichkeiten!\n");
+        } // Ende des switch
+    } // Ende der while-Schleife
+    
+    return 0;
+}
+
+int menue() {
+    bs_loeschen();
+    printf("Halle                 Porta Westfalica");
     printf("\nArtikel:              Artikel:");
     printf("\nBelegung:             Belegung:");
     printf("\n  20cm: 40 %%            20cm: 5 %%");
@@ -29,4 +54,60 @@ int main() {
     printf("\n");
 
     return 0;
+}
+
+int neuen_artikel_anlegen() {
+    int janein = 0;
+
+    int wahl = 0;
+
+    bs_loeschen();
+    printf("(0) Nein");
+    printf("\n(1) Ja");
+    printf("\nNeuen Artikel anlegen?");
+    printf("\n");
+    
+    scanf("%d", &janein);
+
+    if (janein == 0) {
+        return 0;
+    }
+
+    bs_loeschen();
+    printf("Artikel Name:");
+    fflush(stdin);
+    wahl = getchar();
+    fflush(stdin);
+
+    printf("\nArtikel Nummer:");
+    fflush(stdin);
+    wahl = getchar();
+    fflush(stdin);
+
+    printf("\nArtikel Preis:");
+    fflush(stdin);
+    wahl = getchar();
+    fflush(stdin);
+
+    printf("\nArtikel Hoehe:");
+    fflush(stdin);
+    wahl = getchar();
+    fflush(stdin);
+
+    printf("\nArtikel Breite:");
+    fflush(stdin);
+    wahl = getchar();
+    fflush(stdin);
+
+    printf("\nArtikel Tiefe:");
+    fflush(stdin);
+    wahl = getchar();
+    fflush(stdin);
+
+    return 0;
+}
+
+void bs_loeschen(void)
+{
+    system("CLS");   // MS-DOS-Kommando
 }
