@@ -100,7 +100,7 @@ int main(void) {
     return 0;
 }
 
-int menue() {
+int menue() { //hier wird das Menue ausgegeben
     bs_loeschen();
     printf("Halle                 Porta Westfalica");
     printf("\nArtikel:              Artikel:");
