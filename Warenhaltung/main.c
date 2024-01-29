@@ -1,9 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define HALLE_20 18000 //vorhandene Anzahl Positions IDs für 20cm hohe Fächer
+#define HALLE_40 54000
+#define PORTA_20 34800
+#define PORTA_40 6000
+#define PORTA_80 7800
+
 int menue();
 int neuen_artikel_anlegen();
 void bs_loeschen();
+
+
+
+// Beispiel
+
+// id_20 => 2018000
+// id_40 => 4054000
+// id_80 => 807800
+
+// resthöhe
+    // Minimale Höhe für einen Artikel festlegen? 
+       // (minimal 5cm und Maximal 80cm)
+       // (Wenn ein Fach eine Resthöhe von z.B. 5cm hat, dann wird es als "voll" angesehen)
+
+// Beispiel
+// Artikel (20x30x120)
+// (Höhe, Breite, Tiefe)
+
+struct PositionsID {
+    int id;
+    int resthöhe;
+    int positions_id_voll;
+};
+
+
+int belegte_id_halle_20[18000] = [2000001, 2000002, 2000003, ..., 2000245];
+
+if (hohe <= 20) {
+    int id = 2000001;
+    max_anzahl = HALLE_20 + 2000000;
+    anzahl_belegter_ids = breite / 10;
+        for (int id; id <= max_anzahl; id++) {
+            if id in belegte_id_halle_20{
+                break;
+            }
+            else
+                if artikel_name == aktueller_artikel_name
+                    if PositionsID[id].resthöhe >= artikel_höhe
+                        // einlagern
+                    else
+                        // nächste ID
+                else
+                    // nächste ID
+            else // ID noch nicht belegt
+                //artikel einlagern und resthöhe berechnen          
+    }
+}
+
+
+
+
+struct ArtikelTyp {
+    char name[100] = Katzenfutter Bio 100g
+    int art_nummer = 12345
+    int preis = 10
+    int hoehe = 10
+    int breite = 20
+    int tiefe = 10
+};
+
+struct Artikel {
+    int artikel_typ_nummer = 12345
+    int inventarnummer = 9785
+    int positions_id = [3, 4]
+};
+
+
+
+// Hier geht der richtige Code los
 
 int main(void) {
     int auswahl;
