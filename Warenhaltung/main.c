@@ -13,6 +13,7 @@
 
 int menue();
 int neuen_artikel_anlegen();
+int vorhandene_artikel_ansehen();
 void bs_loeschen();
 
 
@@ -120,6 +121,9 @@ int main(void) {
         case 1:
             neuen_artikel_anlegen();
             break;
+        case 7:
+            vorhandene_artikel_ansehen();
+            break;
         default:
             printf("\nFalsche eingabe. Waehle eine der oben aufgelisteten Moeglichkeiten!\n");
         } // Ende des switch
@@ -146,7 +150,7 @@ int menue() { //hier wird das Menue ausgegeben
     printf("\n(4)   Artikel erfassen");
     printf("\n(5)   Artikel entfernen");
     printf("\n(6)   Artikel umraeumen");
-    printf("\n(7)   Artikel ansehen");
+    printf("\n(7)   Alle Artikel ansehen");
     printf("\n(8)   Lagerbestand zufaellig befuellen");
     printf("\n(9)   Zufaellige Bestellung erzeugen");
     printf("\n(10)  Manuelle Bestellung erzeugen");
@@ -268,6 +272,30 @@ int neuen_artikel_anlegen() {
 
     getchar();
 
+    return 0;
+}
+
+// Funktion zeigt bisher erstellte ArtikelTypen an
+int vorhandene_artikel_ansehen() {
+    for (int i = 0; i < anzahl_artikel; i++) {
+        bs_loeschen();
+        struct ArtikelTyp artikeltyp = artikel_liste[i];
+        printf("Anzahl Artikel: %d", anzahl_artikel);
+        printf("\nArtikel Name: %s", artikeltyp.name);
+        printf("\nArtikel Nummer: %d", artikeltyp.art_nummer);
+        printf("\nArtikel Preis: %.2lf", artikeltyp.preis);
+        printf("\nArtikel Hoehe (in cm): %.2lf", artikeltyp.hoehe);
+        printf("\nArtikel Breite (in cm): %.2lf", artikeltyp.breite);
+        printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp.tiefe);
+
+        // Option fuer weiter und zurueck zum Haumptmenue hinzufuegen
+        printf("\n\nDruecke Enter um zum naechsten Artikel zu kommen!");
+        while (getchar() != '\n');
+        getchar();
+    }
+
+    while (getchar() != '\n');
+    getchar();
     return 0;
 }
 
