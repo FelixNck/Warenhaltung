@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define HALLE_20 18000 //vorhandene Anzahl Positions IDs für 20cm hohe Fächer
 #define HALLE_40 54000
 #define PORTA_20 34800
 #define PORTA_40 6000
 #define PORTA_80 7800
+
+// Maximale Anzahl von Artikeln
+#define MAX_ARTIKEL 200
 
 int menue();
 int neuen_artikel_anlegen();
@@ -20,7 +24,7 @@ void bs_loeschen();
 // id_80 => 807800
 
 // resthöhe
-    // Minimale Höhe für einen Artikel festlegen? 
+    // Minimale Höhe für einen Artikel festlegen?
        // (minimal 5cm und Maximal 80cm)
        // (Wenn ein Fach eine Resthöhe von z.B. 5cm hat, dann wird es als "voll" angesehen)
 
@@ -54,7 +58,7 @@ if (hohe <= 20) {
                 else
                     // nächste ID
             else // ID noch nicht belegt
-                //artikel einlagern und resthöhe berechnen          
+                //artikel einlagern und resthöhe berechnen
     }
 }
 
@@ -69,6 +73,30 @@ struct ArtikelTyp {
     double breite;
     double tiefe;
 };
+
+// Liste für bereits angelegte Artikel
+struct ArtikelTyp artikel_liste[MAX_ARTIKEL];
+
+// Anzahl der bereits vorhandenen Artikel
+int anzahl_artikel = 0;
+
+// Funktion zur Überprüfung der Artikel
+int artikel_existiert_bereits(const char* name, int art_nummer) {
+    int i;
+    for (i = 0; i < anzahl_artikel; i++) {
+        if (strcmp(artikel_liste[i].name, name) == 0 && artikel_liste[i].art_nummer == art_nummer) {
+            return 1; // Artikel bereits vorhanden
+        }
+    }
+    return 0; // Artikel nicht vorhanden
+}
+
+//Enumeration, gibt VERDERBLICH Wert 1 und NICHT_VERDERBLICH Wert 2
+enum LagerTyp {
+    VERDERBLICH = 1,
+    NICHT_VERDERBLICH = 2
+};
+
 /*
 struct Artikel {
     int artikel_typ_nummer = 12345
@@ -96,7 +124,7 @@ int main(void) {
             printf("\nFalsche eingabe. Waehle eine der oben aufgelisteten Moeglichkeiten!\n");
         } // Ende des switch
     } // Ende der while-Schleife
-    
+
     return 0;
 }
 
@@ -134,9 +162,8 @@ int menue() { //hier wird das Menue ausgegeben
 int neuen_artikel_anlegen() {
 
     struct ArtikelTyp artikeltyp;
-
     int janein = 0;
-
+    int lagerwahl = 0;
     int wahl = 0;
 
     bs_loeschen();
@@ -144,7 +171,7 @@ int neuen_artikel_anlegen() {
     printf("\n(1) Ja");
     printf("\n(0) Nein");
     printf("\n");
-    
+
     scanf("%d", &janein);
 
     if (janein == 0) {
@@ -160,9 +187,26 @@ int neuen_artikel_anlegen() {
     // input für artikelname auslesen
     scanf("%s", artikeltyp.name);
 
+    // Überprüfen, ob der Artikelname bereits existiert
+    for (int i = 0; i < anzahl_artikel; i++) {
+        if (strcmp(artikeltyp.name, artikel_liste[i].name) == 0) {
+            printf("\nFehler: Ein Artikel mit diesem Namen existiert bereits.\n");
+            return 0; // Rückkehr, da Fehler aufgetreten ist
+        }
+    }
+
     printf("\nArtikel Nummer:");
     // input für artikel nummer auslesen
     scanf("%d", &artikeltyp.art_nummer);
+
+    // Überprüfen, ob die Artikelnummer bereits existiert
+    for (int i = 0; i < anzahl_artikel; i++) {
+        if (artikeltyp.art_nummer == artikel_liste[i].art_nummer) {
+            printf("\nFehler: Artikel mit dieser Nummer existiert bereits.\n");
+            return 0; // Rückkehr, da Fehler aufgetreten ist
+        }
+    }
+
 
     printf("\nPreis (in EUR):");
     // input für artikel preis auslesen
@@ -181,6 +225,27 @@ int neuen_artikel_anlegen() {
     scanf("%lf", &artikeltyp.tiefe);
 
 
+    printf("\nWeisen Sie dem Artikel nun noch zu, ob er verderblich ist oder nicht.\nVerderblich: (1)\nNicht verderblich: (2)");
+    // Eingabe für die Art des Artikels (verderblich oder nicht)
+    scanf("%d", &lagerwahl);
+
+    switch (lagerwahl) {
+    case VERDERBLICH:
+        // Artikel ist verderblich, Lagerort entsprechend festlegen und verarbeiten
+        printf("\nDer Artikel ist als verderblich markiert. Er wird in Halle an der Saale eingelagert.\nDruecken Sie Enter, um den angelegten Artikel anzuzeigen.\n");
+        // Weitere Verarbeitung für das verderbliche Lager hier einfügen
+        break;
+    case NICHT_VERDERBLICH:
+        // Artikel ist nicht verderblich, Lagerort entsprechend festlegen und verarbeiten
+        printf("\nDer Artikel ist als nicht verderblich markiert. Er wird in Porta Westfalica eingelagert.\nDruecken Sie Enter, um den angelegten Artikel anzuzeigen.\n");
+        // Weitere Verarbeitung für das nicht-verderbliche Lager hier einfügen
+        break;
+    default:
+        printf("\nUngültige Eingabe. Bitte wählen Sie eine der angegebenen Optionen.");
+        break;
+    }
+
+
     getchar();
     getchar();
 
@@ -197,6 +262,10 @@ int neuen_artikel_anlegen() {
     printf("\nArtikel Breite (in cm): %.2lf", artikeltyp.breite);
     printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp.tiefe);
 
+    // Hinzufügen des neuen Artikels zur Liste
+    artikel_liste[anzahl_artikel] = artikeltyp;
+    anzahl_artikel++;
+
     getchar();
 
     return 0;
@@ -206,3 +275,4 @@ void bs_loeschen(void)
 {
     system("CLS");   // MS-DOS-Kommando
 }
+
