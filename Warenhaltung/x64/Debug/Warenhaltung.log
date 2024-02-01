@@ -1,2 +1,3 @@
 ﻿  main.c
-  Warenhaltung.vcxproj -> C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\x64\Debug\Warenhaltung.exe
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(580): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+  Warenhaltung.vcxproj -> C:\Users\Jana\source\repos\Warenhaltung\x64\Debug\Warenhaltung.exe
