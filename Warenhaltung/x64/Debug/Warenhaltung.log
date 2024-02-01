@@ -1,3 +1,12 @@
 ﻿  main.c
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(580): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
-  Warenhaltung.vcxproj -> C:\Users\Jana\source\repos\Warenhaltung\x64\Debug\Warenhaltung.exe
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(350,56): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(350,56): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(350,85): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(350,85): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(455,56): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(455,56): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(455,85): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(455,85): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(563): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(580): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
+  Warenhaltung.vcxproj -> C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\x64\Debug\Warenhaltung.exe
