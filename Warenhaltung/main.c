@@ -14,12 +14,13 @@
 int menue();
 int neuen_artikel_anlegen();
 int artikel_bearbeiten();
+int artikel_erfassen();
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(int);
 void bs_loeschen();
 
 
-
+int belegte_id_halle_20[];
 /* Beispiel
 
 // id_20 => 2018000
@@ -44,10 +45,10 @@ struct PositionsID {
 
 int belegte_id_halle_20[18000] = [2000001, 2000002, 2000003, ..., 2000245];
 
-if (hohe <= 20) {
+if (hoehe <= 20) {
     int id = 2000001;
     max_anzahl = HALLE_20 + 2000000;
-    anzahl_belegter_ids = breite / 10;
+    anzahl_belegter_ids = breite / 10;          //Anzahl IDs, die Artikel belegt
         for (int id; id <= max_anzahl; id++) {
             if id in belegte_id_halle_20{
                 break;
@@ -63,6 +64,10 @@ if (hohe <= 20) {
             else // ID noch nicht belegt
                 //artikel einlagern und resthöhe berechnen
     }
+else if ((hoehe > 20) && (hoehe <= 40))
+    int id = 4000001;
+    max_anzahl = HALLE_40 + 4000000;
+    anzahl_belegter_ids = breite / 10;
 }
 
 
@@ -127,6 +132,9 @@ int main(void) {
             break;
         case 2:
             artikel_bearbeiten();
+            break;
+        case 4:
+            artikel_erfassen();
             break;
         case 7:
             vorhandene_artikel_ansehen();
@@ -296,7 +304,7 @@ int artikel_bearbeiten() {
     bs_loeschen();
     printf("Artikel bearbeiten");
     printf("\n");
-    printf("\nMoechten Sie den Artikel anhand der Artikelnummer (1) oder des Namens (2) suchen?");
+    printf("\nMoechten Sie den Artikel anhand der Artikelnummer (1) oder des Namens (2) suchen? ");
     scanf("%d", &auswahl);
 
     switch (auswahl) {
@@ -388,7 +396,7 @@ int artikel_bearbeiten() {
 
                 lager_aktualisieren(i);
 
-                printf("\nSind Sie sicher, dass Sie diese Aenderungen speichern möchten? (1 = Ja, 0 = Nein): ");
+                printf("\nSind Sie sicher, dass Sie diese Aenderungen speichern moechten? (1 = Ja, 0 = Nein): ");
                 scanf("%d", &auswahl);
                 if (auswahl == 1) {
                     printf("\nDie Aenderungen wurden erfolgreich gespeichert.");
@@ -406,7 +414,7 @@ int artikel_bearbeiten() {
         }
         break;
     case 2:
-        printf("\nBitte geben Sie den Artikelnamen ein:");
+        printf("\nBitte geben Sie den Artikelnamen ein: ");
         scanf("%s", suchname);
         for (int i = 0; i < anzahl_artikel; i++) {
             if (strcmp(artikel_liste[i].name, suchname) == 0) {
@@ -479,6 +487,13 @@ int artikel_bearbeiten() {
                         printf("\nUngueltige Auswahl.");
                         break;
                     }
+                    printf("\nArtikel Name: %s", artikel_liste[i].name);
+                    printf("\nArtikel Nummer: %d", artikel_liste[i].art_nummer);
+                    printf("\nArtikel Preis: %.2lf", artikel_liste[i].preis);
+                    printf("\nArtikel Hoehe (in cm): %.2lf", artikel_liste[i].hoehe);
+                    printf("\nArtikel Breite (in cm): %.2lf", artikel_liste[i].breite);
+                    printf("\nArtikel Tiefe (in cm): %.2lf", artikel_liste[i].tiefe);
+                    printf("\n");
 
                     printf("\nMoechten Sie weitere Details bearbeiten? (1 = Ja, 0 = Nein): ");
                     scanf("%d", &weitere_aenderungen);
@@ -486,7 +501,7 @@ int artikel_bearbeiten() {
 
                 lager_aktualisieren(i);
 
-                printf("\nSind Sie sicher, dass Sie diese Aenderungen speichern möchten? (1 = Ja, 0 = Nein): ");
+                printf("\nSind Sie sicher, dass Sie diese Aenderungen speichern moechten? (1 = Ja, 0 = Nein): ");
                 scanf("%d", &auswahl);
                 if (auswahl == 1) {
                     printf("\nDie Aenderungen wurden erfolgreich gespeichert.");
@@ -582,4 +597,81 @@ int lager_aktualisieren(int i) {
 void bs_loeschen(void)
 {
     system("CLS");   // MS-DOS-Kommando
+}
+
+
+// Funktion zum Suchen, Anzeigen und einlagern (dazu ists noch nicht gekommen) Artikels
+int artikel_erfassen() {
+    struct artikeltyp;
+    int gefunden = 0;
+
+    do {
+        int eingabeNummer;
+        char eingabeName[100];
+
+        bs_loeschen(); // Annahme: Diese Funktion löscht den Bildschirm oder führt ähnliche Aktionen durch
+
+        printf("Geben Sie die Artikelnummer oder den Artikelnamen ein: ");
+        if (scanf("%d", &eingabeNummer) == 1) { // Eingabe als Nummer
+            for (int i = 0; i < sizeof(artikel_liste) / sizeof(artikel_liste[0]); i++) {
+                if (artikel_liste[i].art_nummer == eingabeNummer) {
+                    printf("\nArtikel gefunden:\n");
+                    printf("Name: %s\n", artikel_liste[i].name);
+                    printf("Artikelnummer: %d\n", artikel_liste[i].art_nummer);
+                    printf("Preis (in EUR): %d\n", artikel_liste[i].preis);         //wird alles scheinbar noch nicht aus richtiger Liste entnommen, also nicht angezeigt
+                    printf("Hoehe (in cm): %d\n", artikel_liste[i].hoehe);          //Artikelname, Lager und Nummer werden korrekt angezeigt
+                    printf("Breite (in cm): %d\n", artikel_liste[i].breite);
+                    printf("Tiefe (in cm): %d\n", artikel_liste[i].tiefe);
+                    printf("Lager: %d\n", artikel_liste[i].lager);                  //Lager 1 (HALLE) oder 2 (PW) wird ausgegeben
+                    gefunden = 1;
+                    break;
+                }
+            }
+        }
+        else { // Eingabe als Name
+            scanf("%s", eingabeName);
+            for (int i = 0; i < sizeof(artikel_liste) / sizeof(artikel_liste[0]); i++) {
+                if (strcmp(artikel_liste[i].name, eingabeName) == 0) {
+                    printf("\nArtikel gefunden:\n");
+                    printf("Name: %s\n", artikel_liste[i].name);
+                    printf("Nummer: %d\n", artikel_liste[i].art_nummer);
+                    printf("Preis (in EUR): %.2lf\n", artikel_liste[i].preis);
+                    printf("Hoehe (in cm): %.2lf\n", artikel_liste[i].hoehe);
+                    printf("Breite (in cm): %.2lf\n", artikel_liste[i].breite);
+                    printf("Tiefe (in cm): %.2lf\n", artikel_liste[i].tiefe);
+                    printf("Lager: %s\n", artikel_liste[i].lager);      //Lager wieder in String umwandeln, wenns mit ausgegeben werden soll?
+                    gefunden = 1;
+                    break;
+                }
+            }
+        }
+
+        if (!gefunden) {
+            printf("\nArtikel nicht gefunden.\n");
+        }
+        else {
+            char antwort;
+            printf("\nMoechten Sie diesen Artikel anlegen? (j/n): ");
+            scanf(" %c", &antwort);
+            if (antwort == 'j' || antwort == 'J') {
+                // Hier dann Funktion zum Anlegen des Artikels oder separat definiert
+                printf("\nArtikel wird angelegt...\n");
+            }
+            else {
+                char wahl;
+                printf("Moechten Sie zum Menue zurueckkehren (0) oder nach einem anderen Artikel suchen (1) ?: ");
+                scanf(" %c", &wahl);
+                if (wahl == '0') {
+                    printf("Zurueck zum Menue...\n");
+                    break; // Beendet die Schleife und kehrt zum Menü zurück
+                }
+                else {
+                    printf("Suche nach einem anderen Artikel...\n");
+                    // Schleife wird fortgesetzt, um erneut nach einem Artikel zu suchen
+                }
+            }
+        }
+    } while (1); // Endlosschleife für die Suche nach Artikeln; noch nicht toll, weil nach Anlegen weitere Abfrage kommt
+
+    return 0;
 }
