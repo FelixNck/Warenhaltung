@@ -15,12 +15,14 @@ int menue();
 int neuen_artikel_anlegen();
 int artikel_bearbeiten();
 int artikel_erfassen();
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager);
+int artikel_einlagern_nach_name(char eingabeName[], int lager);
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(int);
 void bs_loeschen();
 
 
-int belegte_id_halle_20[];
+//int belegte_id_halle_20[];
 /* Beispiel
 
 // id_20 => 2018000
@@ -602,28 +604,32 @@ void bs_loeschen(void)
 
 // Funktion zum Suchen, Anzeigen und einlagern (dazu ists noch nicht gekommen) Artikels
 int artikel_erfassen() {
-    struct artikeltyp;
     int gefunden = 0;
+    int eingabeNummer;
+    char eingabeName[100];
 
     do {
-        int eingabeNummer;
-        char eingabeName[100];
-
-        bs_loeschen(); // Annahme: Diese Funktion löscht den Bildschirm oder führt ähnliche Aktionen durch
+        bs_loeschen();
 
         printf("Geben Sie die Artikelnummer oder den Artikelnamen ein: ");
         if (scanf("%d", &eingabeNummer) == 1) { // Eingabe als Nummer
             for (int i = 0; i < sizeof(artikel_liste) / sizeof(artikel_liste[0]); i++) {
                 if (artikel_liste[i].art_nummer == eingabeNummer) {
+                    gefunden = 1;
                     printf("\nArtikel gefunden:\n");
                     printf("Name: %s\n", artikel_liste[i].name);
                     printf("Artikelnummer: %d\n", artikel_liste[i].art_nummer);
-                    printf("Preis (in EUR): %d\n", artikel_liste[i].preis);         //wird alles scheinbar noch nicht aus richtiger Liste entnommen, also nicht angezeigt
-                    printf("Hoehe (in cm): %d\n", artikel_liste[i].hoehe);          //Artikelname, Lager und Nummer werden korrekt angezeigt
-                    printf("Breite (in cm): %d\n", artikel_liste[i].breite);
-                    printf("Tiefe (in cm): %d\n", artikel_liste[i].tiefe);
-                    printf("Lager: %d\n", artikel_liste[i].lager);                  //Lager 1 (HALLE) oder 2 (PW) wird ausgegeben
-                    gefunden = 1;
+                    printf("Preis (in EUR): %.2lf\n", artikel_liste[i].preis);
+                    printf("Hoehe (in cm): %.2lf\n", artikel_liste[i].hoehe);
+                    printf("Breite (in cm): %.2lf\n", artikel_liste[i].breite);
+                    printf("Tiefe (in cm): %.2lf\n", artikel_liste[i].tiefe);
+                    printf("Lager: %d\n", artikel_liste[i].lager);
+                    char antwort;
+                    printf("\nMoechten Sie diesen Artikel einlagern? (j/n): ");
+                    scanf(" %c", &antwort);
+                    if (antwort == 'j' || antwort == 'J') {
+                        artikel_einlagern_nach_nummer(eingabeNummer, artikel_liste[i].lager);
+                    }
                     break;
                 }
             }
@@ -632,6 +638,7 @@ int artikel_erfassen() {
             scanf("%s", eingabeName);
             for (int i = 0; i < sizeof(artikel_liste) / sizeof(artikel_liste[0]); i++) {
                 if (strcmp(artikel_liste[i].name, eingabeName) == 0) {
+                    gefunden = 1;
                     printf("\nArtikel gefunden:\n");
                     printf("Name: %s\n", artikel_liste[i].name);
                     printf("Nummer: %d\n", artikel_liste[i].art_nummer);
@@ -639,39 +646,74 @@ int artikel_erfassen() {
                     printf("Hoehe (in cm): %.2lf\n", artikel_liste[i].hoehe);
                     printf("Breite (in cm): %.2lf\n", artikel_liste[i].breite);
                     printf("Tiefe (in cm): %.2lf\n", artikel_liste[i].tiefe);
-                    printf("Lager: %s\n", artikel_liste[i].lager);      //Lager wieder in String umwandeln, wenns mit ausgegeben werden soll?
-                    gefunden = 1;
+                    printf("Lager: %d\n", artikel_liste[i].lager);
+                    char antwort;
+                    printf("\nMoechten Sie diesen Artikel einlagern? (j/n): ");
+                    scanf(" %c", &antwort);
+                    if (antwort == 'j' || antwort == 'J') {
+                        artikel_einlagern_nach_name(eingabeName, artikel_liste[i].lager);
+                    }
                     break;
                 }
             }
         }
 
         if (!gefunden) {
-            printf("\nArtikel nicht gefunden.\n");
+            printf("\nArtikel nicht gefunden. Druecken Sie Enter, um einen neuen Artikel zu suchen!\n");
+            while (getchar() != '\n');
+            getchar();
         }
         else {
-            char antwort;
-            printf("\nMoechten Sie diesen Artikel anlegen? (j/n): ");
-            scanf(" %c", &antwort);
-            if (antwort == 'j' || antwort == 'J') {
-                // Hier dann Funktion zum Anlegen des Artikels oder separat definiert
-                printf("\nArtikel wird angelegt...\n");
+            char wahl;
+            printf("Moechten Sie zum Menue zurueckkehren (0) oder nach einem anderen Artikel suchen (1) ?: ");
+            scanf(" %c", &wahl);
+            if (wahl == '0') {
+                printf("Zurueck zum Menü...\n");
+                break;
             }
             else {
-                char wahl;
-                printf("Moechten Sie zum Menue zurueckkehren (0) oder nach einem anderen Artikel suchen (1) ?: ");
-                scanf(" %c", &wahl);
-                if (wahl == '0') {
-                    printf("Zurueck zum Menue...\n");
-                    break; // Beendet die Schleife und kehrt zum Menü zurück
-                }
-                else {
-                    printf("Suche nach einem anderen Artikel...\n");
-                    // Schleife wird fortgesetzt, um erneut nach einem Artikel zu suchen
-                }
+                printf("Suche nach einem anderen Artikel...\n");
             }
         }
-    } while (1); // Endlosschleife für die Suche nach Artikeln; noch nicht toll, weil nach Anlegen weitere Abfrage kommt
+    } while (1);
 
+    return 0;
+}
+
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager) {
+    // Überprüfen des Lagers und entsprechende Aktionen ausführen
+    if (lager == 1) {
+        // Aktionen für Lager 1 (HALLE)
+        printf("Artikel mit der Nummer %d wird im Halle Lager eingelagert.\n", eingabeNummer);
+    }
+    else if (lager == 2) {
+        // Aktionen für Lager 2 (PW)
+        printf("Artikel mit der Nummer %d wird im Porta Westfalica Lager eingelagert.\n", eingabeNummer);
+    }
+    else {
+        // Fehlermeldung für unbekanntes Lager
+        printf("Unbekanntes Lager für Artikel mit der Nummer %d.\n", eingabeNummer);
+    }
+
+    // Weitere Aktionen oder Rückgaben hier, falls erforderlich
+    return 0;
+}
+
+int artikel_einlagern_nach_name(char eingabeName[], int lager) {
+    // Überprüfen des Lagers und entsprechende Aktionen ausführen
+    if (lager == 1) {
+        // Aktionen für Lager 1 (HALLE)
+        printf("Artikel mit dem Namen %s wird im Halle Lager eingelagert.\n", eingabeName);
+    }
+    else if (lager == 2) {
+        // Aktionen für Lager 2 (PW)
+        printf("Artikel mit dem Namen %s wird im Porta Westfalica Lager eingelagert.\n", eingabeName);
+    }
+    else {
+        // Fehlermeldung für unbekanntes Lager
+        printf("Unbekanntes Lager fuer Artikel mit dem Namen %s.\n", eingabeName);
+    }
+
+    // Weitere Aktionen oder Rückgaben hier, falls erforderlich
     return 0;
 }
