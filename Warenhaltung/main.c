@@ -151,9 +151,9 @@ int main(void) {
 
 int menue() { //hier wird das Menue ausgegeben
     bs_loeschen();
-    printf("Halle                 Porta Westfalica");
-    printf("\nArtikel:              Artikel:");
-    printf("\nBelegung:             Belegung:");
+    printf("  Halle\t\t\tPorta Westfalica");
+    printf("\n  %d Artikel\t\t%d Artikel", halle_lager.anzahl_artikel, porta_lager.anzahl_artikel); 
+    printf("\n  Belegung:\t\tBelegung:");
     printf("\n  20cm: 40 %%            20cm: 5 %%");
     printf("\n  40cm: 14 %%            40cm: 51 %%");
     printf("\n  80cm: 79 %%");
@@ -602,7 +602,7 @@ void bs_loeschen(void)
 }
 
 
-// Funktion zum Suchen, Anzeigen und einlagern (dazu ists noch nicht gekommen) Artikels
+// Funktion zum Suchen, Anzeigen und einlagern (dazu ists noch nicht gekommen) des Artikels
 int artikel_erfassen() {
     int gefunden = 0;
     int eingabeNummer;
@@ -681,7 +681,7 @@ int artikel_erfassen() {
 }
 
 int artikel_einlagern_nach_nummer(int eingabeNummer, int lager) {
-    // Überprüfen des Lagers und entsprechende Aktionen ausführen
+    // Überprüfen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
         printf("Artikel mit der Nummer %d wird im Halle Lager eingelagert.\n", eingabeNummer);
@@ -691,29 +691,27 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager) {
         printf("Artikel mit der Nummer %d wird im Porta Westfalica Lager eingelagert.\n", eingabeNummer);
     }
     else {
-        // Fehlermeldung für unbekanntes Lager
+        // Fehlermeldung 
         printf("Unbekanntes Lager für Artikel mit der Nummer %d.\n", eingabeNummer);
     }
 
-    // Weitere Aktionen oder Rückgaben hier, falls erforderlich
     return 0;
 }
 
 int artikel_einlagern_nach_name(char eingabeName[], int lager) {
-    // Überprüfen des Lagers und entsprechende Aktionen ausführen
+    // Überprüfen des Lagers und dann Berechnungen
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
         printf("Artikel mit dem Namen %s wird im Halle Lager eingelagert.\n", eingabeName);
     }
     else if (lager == 2) {
-        // Aktionen für Lager 2 (PW)
+        // Aktionen für Lager 2 (PW) einzeln, weil es noch 80cm gibt
         printf("Artikel mit dem Namen %s wird im Porta Westfalica Lager eingelagert.\n", eingabeName);
     }
     else {
-        // Fehlermeldung für unbekanntes Lager
+        // Fehlermeldung, mehr oder weniger sinnlos
         printf("Unbekanntes Lager fuer Artikel mit dem Namen %s.\n", eingabeName);
     }
 
-    // Weitere Aktionen oder Rückgaben hier, falls erforderlich
     return 0;
 }
