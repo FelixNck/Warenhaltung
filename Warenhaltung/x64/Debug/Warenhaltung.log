@@ -1,18 +1,12 @@
 ﻿  main.c
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(358,56): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "char *" und "int" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(358,56): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 1
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(358,85): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(358,85): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 2
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(463,56): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "char *" und "int" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(463,56): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 1
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(463,85): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(463,85): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 2
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(621,28): warning C4477: "printf": Die Formatzeichenfolge "%d" erfordert ein Argument vom Typ "int", das variadic-Argument "1" weist aber den Typ "double" auf.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(622,28): warning C4477: "printf": Die Formatzeichenfolge "%d" erfordert ein Argument vom Typ "int", das variadic-Argument "1" weist aber den Typ "double" auf.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(623,28): warning C4477: "printf": Die Formatzeichenfolge "%d" erfordert ein Argument vom Typ "int", das variadic-Argument "1" weist aber den Typ "double" auf.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(624,28): warning C4477: "printf": Die Formatzeichenfolge "%d" erfordert ein Argument vom Typ "int", das variadic-Argument "1" weist aber den Typ "double" auf.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(642,28): warning C4477: "printf": Die Formatzeichenfolge "%s" erfordert ein Argument vom Typ "char *", das variadic-Argument "1" weist aber den Typ "int" auf.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(642,28): warning C4313: „printf“: „%s“ in der Formatzeichenfolge steht mit dem Argument 1 vom Typ „int“ in Konflikt.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(595): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(578): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(360,56): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(360,56): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(360,85): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(360,85): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(465,56): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(465,56): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(465,85): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(465,85): warning C4024: "strcpy": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(580): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(597): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
   Warenhaltung.vcxproj -> C:\Users\Jana\source\repos\Warenhaltung\x64\Debug\Warenhaltung.exe
