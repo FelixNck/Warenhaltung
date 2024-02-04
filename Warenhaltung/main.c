@@ -9,6 +9,14 @@
 #define PORTA_40 6000
 #define PORTA_80 7800
 
+
+// StartIDs zum Zaehlen; Halle = Lager 1; PW = Lager 2
+#define START_ID_HALLE_20CM 12000001
+#define START_ID_HALLE_40CM 14000001
+#define START_ID_PORTA_20CM 22000001
+#define START_ID_PORTA_40CM 2400001
+#define START_ID_PORTA_80CM 2400001
+
 // Maximale Anzahl von Artikeln
 #define MAX_ARTIKEL 400
 
@@ -17,13 +25,21 @@ int neuen_artikel_anlegen();
 int artikel_bearbeiten();
 int details_waehlen_bearbeitung(struct ArtikelTyp *artikel);
 int artikel_erfassen();
-int artikel_einlagern_nach_nummer(int eingabeNummer, int lager);
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, double artikel_hoehe, double artikel_breite, double artikel_tiefe);
 int artikel_einlagern_nach_name(char eingabeName[], int lager);
+int berechne_belegte_ids(struct Artikel artikel, int zaehler);
+int add_belegte_id(int lager, int hoehe, int id, int artikelnummer, int resthoehe);
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen();
 void strtrim(char* str);    //Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
 
+int inventarnummerZaehler = 1000;
+int belegte_id_halle_20[HALLE_20]; // Array für belegte IDs im Halle-Lager mit 20cm Höhe
+int belegte_id_halle_40[HALLE_40]; // Array für belegte IDs im Halle-Lager mit 40cm Höhe
+int belegte_id_porta_20[PORTA_20]; // Array für belegte IDs im Porta-Lager mit 20cm Höhe
+int belegte_id_porta_40[PORTA_40]; // Array für belegte IDs im Porta-Lager mit 40cm Höhe
+int belegte_id_porta_80[PORTA_80]; // Array für belegte IDs im Porta-Lager mit 80cm Höhe
 
 //int belegte_id_halle_20[];
 /* Beispiel
@@ -40,16 +56,34 @@ void strtrim(char* str);    //Leerzeichen am Anfang und Ende einer Eingabe ignor
 // Beispiel
 // Artikel (20x30x120)
 // (Höhe, Breite, Tiefe)
-
+*/
 struct PositionsID {
     int id;
     int resthöhe;
     int positions_id_voll;
+    int artikelnummer; // Artikelnummer an dieser Position
+};
+
+struct ArtikelTyp {
+    char name[100];
+    int art_nummer;
+    double preis;
+    double hoehe;
+    double breite;
+    double tiefe;
+    int lager;
+};
+
+struct Artikel {
+    struct ArtikelTyp typ;
+    int inventarnummer;
+    struct PositionsID* positions; // Pointer auf PositionsID
+    int num_positions;  // Anzahl PosIDs
 };
 
 
-int belegte_id_halle_20[18000] = [2000001, 2000002, 2000003, ..., 2000245];
-
+//int belegte_id_halle_20[18000] = [2000001, 2000002, 2000003, ..., 2000245];
+/*
 if (hoehe <= 20) {
     int id = 2000001;
     max_anzahl = HALLE_20 + 2000000;
@@ -84,15 +118,6 @@ enum LagerTyp {
     PORTA_WESTFALICA = 2    //nicht verderblich
 };
 
-struct ArtikelTyp {
-    char name[100];
-    int art_nummer;
-    double preis;
-    double hoehe;
-    double breite;
-    double tiefe;
-    int lager;
-};
 
 struct Lager {
     struct ArtikelTyp artikel_liste[MAX_ARTIKEL];
@@ -108,14 +133,9 @@ struct ArtikelTyp artikel_liste[MAX_ARTIKEL];
 // Anzahl der bereits vorhandenen Artikel
 int anzahl_artikel = 0;
 
-/*
-struct Artikel {
-    int artikel_typ_nummer = 12345
-    int inventarnummer = 9785
-    int positions_id = [3, 4]
-};
 
-*/
+
+
 
 // Hier geht der richtige Code los
 
@@ -586,9 +606,15 @@ int artikel_erfassen() {
                         return 0;
                     }
                     else if (wahl == '2') {
-                        artikel_einlagern_nach_nummer(eingabeNummer, artikel_liste[i].lager);
+                        struct Artikel artikel;
+                        artikel.typ = artikel_liste[i];
+                        artikel.inventarnummer = generiere_inventarnummer(); // Hier wird die Inventarnummer generiert und zugewiesen
+
+                        printf("Generierte Inventarnummer: %d\n", artikel.inventarnummer); // Hier wird die generierte Inventarnummer ausgegeben
+
+                        artikel_einlagern_nach_nummer(eingabeNummer, artikel_liste[i].lager, artikel);
+                        break;
                     }
-                    break;
                 }
             }
         }
@@ -633,16 +659,23 @@ int artikel_erfassen() {
     return 0;
 }
 
-int artikel_einlagern_nach_nummer(int eingabeNummer, int lager) {
+int generiere_inventarnummer() {
+    // Inkrementiere den Zähler und gib die neue Inventarnummer zurück
+    return ++inventarnummerZaehler;
+}
+
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel) {
     // Überprüfen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
+        int belegte_ids = berechne_belegte_ids(artikel, 0); // Start-Zaehlerwert
         printf("Artikel mit der Nummer %d wird im Halle Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
         while (getchar() != '\n');
         getchar();
     }
     else if (lager == 2) {
         // Aktionen für Lager 2 (PW)
+        int belegte_ids = berechne_belegte_ids(artikel, 0); // Start-Zaehlerwert
         printf("Artikel mit der Nummer %d wird im Porta Westfalica Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
         while (getchar() != '\n');
         getchar();
@@ -679,6 +712,85 @@ int artikel_einlagern_nach_name(char eingabeName[], int lager) {
     }
 
     return 1;
+}
+
+int berechne_belegte_ids(struct Artikel artikel, int zaehler) {
+    int start_id = 0;
+    int max_anzahl_halle_20 = HALLE_20 + 12000000;
+    int max_anzahl_halle_40 = HALLE_40 + 14000000;
+
+    // Zugriff auf die Höhe des Artikels
+    double hoehe = artikel.typ.hoehe;
+    int artikelnummer = artikel.typ.art_nummer; // Zugriff auf die Artikelnummer
+
+    if (hoehe <= 20) {
+        start_id = START_ID_HALLE_20CM;
+
+        // Schleife für 20 cm hohe Artikel
+        for (int i = 0; i < max_anzahl_halle_20; i++) {
+            // Überprüfung der Positionen im Lager für 20 cm hohe Artikel
+            // Vergleich der Artikelnummer und Resthöhe
+            if (artikel.positions[i].resthöhe >= hoehe && artikel.positions[i].artikelnummer == artikelnummer) {
+                return start_id + zaehler; // Rückgabe der berechneten ID
+            }
+        }
+    }
+    else if ((hoehe > 20) && (hoehe <= 40)) {
+        start_id = START_ID_HALLE_40CM;
+
+        // Schleife für 40 cm hohe Artikel
+        for (int i = 0; i < max_anzahl_halle_40; i++) {
+            // Überprüfung der Positionen im Lager für 40 cm hohe Artikel
+            // Vergleich der Artikelnummer und Resthöhe
+            if (artikel.positions[i].resthöhe >= hoehe && artikel.positions[i].artikelnummer == artikelnummer) {
+                return start_id + zaehler; // Rückgabe der berechneten ID
+            }
+        }
+    }
+
+    // Rückgabe eines ungültigen Wertes, falls keine passende Position gefunden wurde
+    return -1;
+}
+
+
+// Funktion zum Hinzufügen einer belegten ID in das entsprechende Array basierend auf Lager und Höhe
+int add_belegte_id(int lager, int hoehe, int id, int artikelnummer, int resthoehe) {
+    int i;
+    int max_anzahl_Halle_20 = HALLE_20 + 12000000;
+    int max_anzahl_Halle_40 = HALLE_40 + 14000000;
+    int max_anzahl_Porta_20 = PORTA_20 + 22000000;
+    int max_anzahl_Porta_40 = PORTA_40 + 2400000;
+    int max_anzahl_Porta_80 = PORTA_80 + 2800000;
+    if (lager == 1) { // Halle
+        if (hoehe <= 20) {
+            for (i = 0; i < max_anzahl_Halle_20; i++) {
+                if (belegte_id_halle_20[i] == -1) {
+                    belegte_id_halle_20[i] = id;
+                    break;
+                }
+            }
+        }
+        else if ((hoehe > 20) && (hoehe <= 40)) {
+            for (int i = 0; i < HALLE_40; i++) {
+                if (belegte_id_halle_40[i] == -1) {
+                    belegte_id_halle_40[i] = id;
+                    break;
+                }
+            }
+        }
+    }
+    else if (lager == 2) { // Porta
+        if (hoehe <= 20) {
+            for (int i = 0; i < PORTA_20; i++) {
+                if (belegte_id_porta_20[i] == -1) {
+                    belegte_id_porta_20[i] = id;
+                    break;
+                }
+            }
+        }
+        // Weitere Fälle 
+    }
+    // Weitere Fälle
 }
 
 void strtrim(char* str) {
