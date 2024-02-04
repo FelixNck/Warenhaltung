@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define HALLE_20 18000 //vorhandene Anzahl Positions IDs für 20cm hohe Fächer
 #define HALLE_40 54000
@@ -21,6 +22,7 @@ int artikel_einlagern_nach_name(char eingabeName[], int lager);
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen();
+void strtrim(char* str);    //Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
 
 
 //int belegte_id_halle_20[];
@@ -211,6 +213,7 @@ int neuen_artikel_anlegen() {
     // Entferne das Zeilenumbruchzeichen am Ende der Eingabe
     artikeltyp.name[strcspn(artikeltyp.name, "\n")] = '\0';
 
+    strtrim(artikeltyp.name);   //löscht Leerzeichen hinter/vor Name
     // Überprüfen, ob der Artikelname bereits existiert
     for (i = 0; i < anzahl_artikel; i++) {
         if (strcmp(artikeltyp.name, artikel_liste[i].name) == 0) {
@@ -258,14 +261,14 @@ int neuen_artikel_anlegen() {
         halle_lager.artikel_liste[halle_lager.anzahl_artikel] = artikeltyp;
         halle_lager.anzahl_artikel++;
         artikeltyp.lager = 1;
-        printf("\nDer Artikel wurde erfolgreich in Halle an der Saale eingelagert.\nDruecken Sie Enter, um fortzufahren.\n");
+        printf("\nDer Artikel wurde erfolgreich in Halle an der Saale angelegt.\nDruecken Sie Enter, um fortzufahren.\n");
         break;
     case PORTA_WESTFALICA:
         // Artikel ist nicht verderblich, Lagerort entsprechend festlegen und verarbeiten
         porta_lager.artikel_liste[porta_lager.anzahl_artikel] = artikeltyp;
         porta_lager.anzahl_artikel++;
         artikeltyp.lager = 2;
-        printf("\nDer Artikel wurde erfolgreich in Porta Westfalica eingelagert.\nDruecken Sie Enter, um fortzufahren.\n");
+        printf("\nDer Artikel wurde erfolgreich in Porta Westfalica angelegt.\nDruecken Sie Enter, um fortzufahren.\n");
         break;
     default:
         printf("\nUngueltige Eingabe. Bitte waehlen Sie eine der angegebenen Optionen.");
@@ -344,7 +347,10 @@ int artikel_bearbeiten() {
         break;
     case 2:
         printf("\nBitte geben Sie den Artikelnamen ein: ");
-        scanf("%s", suchname);
+        getchar(); // Leertaste nach vorheriger Eingabe abfangen
+        fgets(suchname, sizeof(suchname), stdin); // Einlesen des Namens mit Leerzeichen
+        suchname[strcspn(suchname, "\n")] = 0; // Entfernen des Zeilenumbruchs
+        strtrim(suchname);
         for (i = 0; i < anzahl_artikel; i++) {
             if (strcmp(artikel_liste[i].name, suchname) == 0) {
                 // Artikel gefunden
@@ -397,7 +403,10 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
         switch (auswahl) {
         case 1:
             printf("\nBitte geben Sie den neuen Namen ein: ");
-            scanf("%s", temp_artikel.name);
+            getchar(); // Leertaste nach vorheriger Eingabe abfangen
+            fgets(temp_artikel.name, sizeof(temp_artikel.name), stdin); // Einlesen des Namens mit Leerzeichen
+            temp_artikel.name[strcspn(temp_artikel.name, "\n")] = 0; // Entfernen des Zeilenumbruchs
+            strtrim(temp_artikel.name);
             // Überprüfung, ob der Name bereits existiert
             for (i = 0; i < anzahl_artikel; i++) {
                 if (strcmp(temp_artikel.name, artikel_liste[i].name) == 0 && temp_artikel.art_nummer != artikel_liste[i].art_nummer) {
@@ -457,7 +466,7 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
     printf("\nMoechten Sie diese Aenderungen speichern? (1 = Ja, 0 = Nein): ");
     scanf("%d", &auswahl);
     if (auswahl == 1) {
-        printf("\nDie Aenderungen wurden erfolgreich gespeichert.\nDruecken Sie Enter, um zum Menue zurückzukehren!");
+        printf("\nDie Aenderungen wurden erfolgreich gespeichert.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
         while (getchar() != '\n');
         getchar();
         *artikel = temp_artikel; // Aktualisierung des Originalartikels mit den Änderungen aus der temporären Kopie
@@ -551,7 +560,10 @@ int artikel_erfassen() {
     char wahl;
     int i;
 
+
     do {
+        gefunden = 0; // Zurücksetzen des gefunden-Flags
+
         bs_loeschen();
 
         printf("Geben Sie die Artikelnummer oder den Artikelnamen ein: ");
@@ -559,42 +571,52 @@ int artikel_erfassen() {
             for (i = 0; i < anzahl_artikel; i++) {
                 if (artikel_liste[i].art_nummer == eingabeNummer) {
                     gefunden = 1;
-                    printf("\nArtikel gefunden:\n");
-                    printf("Name: %s\n", artikel_liste[i].name);
-                    printf("Artikelnummer: %d\n", artikel_liste[i].art_nummer);
-                    printf("Preis (in EUR): %.2lf\n", artikel_liste[i].preis);
-                    printf("Hoehe (in cm): %.2lf\n", artikel_liste[i].hoehe);
-                    printf("Breite (in cm): %.2lf\n", artikel_liste[i].breite);
-                    printf("Tiefe (in cm): %.2lf\n", artikel_liste[i].tiefe);
-                    printf("Lager: %d\n", artikel_liste[i].lager);
-                    printf("\nMoechten Sie zum Menue zurueckkehren (0) oder nach einem anderen Artikel suchen (1) ?: ");
+                    printf("\nArtikel gefunden:");
+                    printf("\nName: %s", artikel_liste[i].name);
+                    printf("\nArtikelnummer: %d", artikel_liste[i].art_nummer);
+                    printf("\nPreis (in EUR): %.2lf", artikel_liste[i].preis);
+                    printf("\nHoehe (in cm): %.2lf", artikel_liste[i].hoehe);
+                    printf("\nBreite (in cm): %.2lf", artikel_liste[i].breite);
+                    printf("\nTiefe (in cm): %.2lf", artikel_liste[i].tiefe);
+                    printf("\nLager: %d", artikel_liste[i].lager);
+                    printf("\nMoechten Sie zum Menue zurueckkehren (0), nach einem anderen Artikel suchen (1) oder den Artikel einlagern (2)?: ");
                     scanf(" %c", &wahl);
                     if (wahl == '0') {
-                        printf("Zurueck zum Menue...\n");
+                        printf("\nZurueck zum Menue...");
                         return 0;
+                    }
+                    else if (wahl == '2') {
+                        artikel_einlagern_nach_nummer(eingabeNummer, artikel_liste[i].lager);
                     }
                     break;
                 }
             }
         }
         else { // Eingabe als Name
-            scanf("%s", eingabeName);
+            getchar(); 
+            fgets(eingabeName, sizeof(eingabeName), stdin); // Einlesen mit Leerzeichen moeglich/ganze Zeile
+            eingabeName[strcspn(eingabeName, "\n")] = 0; // Entfernen der Zeilenumbruchzeichen (\n)
+            strtrim(eingabeName); // Leerzeichen am Anfang und Ende entfernen
+
             for (i = 0; i < anzahl_artikel; i++) {
                 if (strcmp(artikel_liste[i].name, eingabeName) == 0) {
                     gefunden = 1;
-                    printf("\nArtikel gefunden:\n");
-                    printf("Name: %s\n", artikel_liste[i].name);
-                    printf("Nummer: %d\n", artikel_liste[i].art_nummer);
-                    printf("Preis (in EUR): %.2lf\n", artikel_liste[i].preis);
-                    printf("Hoehe (in cm): %.2lf\n", artikel_liste[i].hoehe);
-                    printf("Breite (in cm): %.2lf\n", artikel_liste[i].breite);
-                    printf("Tiefe (in cm): %.2lf\n", artikel_liste[i].tiefe);
-                    printf("Lager: %d\n", artikel_liste[i].lager);
-                    printf("\nMoechten Sie zum Menue zurueckkehren (0) oder nach einem anderen Artikel suchen (1) ?: ");
+                    printf("\nArtikel gefunden:");
+                    printf("\nName: %s", artikel_liste[i].name);
+                    printf("\nNummer: %d", artikel_liste[i].art_nummer);
+                    printf("\nPreis (in EUR): %.2lf", artikel_liste[i].preis);
+                    printf("\nHoehe (in cm): %.2lf", artikel_liste[i].hoehe);
+                    printf("\nBreite (in cm): %.2lf", artikel_liste[i].breite);
+                    printf("\nTiefe (in cm): %.2lf", artikel_liste[i].tiefe);
+                    printf("\nLager: %d", artikel_liste[i].lager);
+                    printf("\nMoechten Sie zum Menue zurueckkehren (0), nach einem anderen Artikel suchen (1) oder den Artikel einlagern (2)?: ");
                     scanf(" %c", &wahl);
                     if (wahl == '0') {
-                        printf("Zurueck zum Menue...\n");
+                        printf("\nZurueck zum Menue...");
                         return 0;
+                    }
+                    else if (wahl == '2') {
+                        artikel_einlagern_nach_name(eingabeName, artikel_liste[i].lager);
                     }
                     break;
                 }
@@ -603,13 +625,9 @@ int artikel_erfassen() {
 
         if (!gefunden) {
             printf("\nArtikel nicht gefunden.\n");
-            printf("Moechten Sie zum Menue zurueckkehren (0) oder einen neuen Artikel suchen (1) ?: ");
-            scanf(" %c", &wahl);
-            if (wahl == '0') {
-                printf("Zurueck zum Menue...\n");
-                return 0;
-            }
         }
+        printf("Moechten Sie zum Menue zurueckkehren (0) oder einen neuen Artikel suchen (1) ?: ");
+        scanf(" %c", &wahl);
     } while (wahl != '0');
 
     return 0;
@@ -619,34 +637,75 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager) {
     // Überprüfen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
-        printf("Artikel mit der Nummer %d wird im Halle Lager eingelagert.\n", eingabeNummer);
+        printf("Artikel mit der Nummer %d wird im Halle Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
+        while (getchar() != '\n');
+        getchar();
     }
     else if (lager == 2) {
         // Aktionen für Lager 2 (PW)
-        printf("Artikel mit der Nummer %d wird im Porta Westfalica Lager eingelagert.\n", eingabeNummer);
+        printf("Artikel mit der Nummer %d wird im Porta Westfalica Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
+        while (getchar() != '\n');
+        getchar();
     }
     else {
         // Fehlermeldung 
-        printf("Unbekanntes Lager für Artikel mit der Nummer %d.\n", eingabeNummer);
+        printf("Unbekanntes Lager für Artikel mit der Nummer %d.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
+        while (getchar() != '\n');
+        getchar();
     }
 
-    return 0;
+    return 1;
 }
 
 int artikel_einlagern_nach_name(char eingabeName[], int lager) {
     // Überprüfen des Lagers und dann Berechnungen
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
-        printf("Artikel mit dem Namen %s wird im Halle Lager eingelagert.\n", eingabeName);
+        printf("Artikel mit dem Namen %s wird im Halle Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeName);
+        while (getchar() != '\n');
+        getchar();
     }
     else if (lager == 2) {
         // Aktionen für Lager 2 (PW) einzeln, weil es noch 80cm gibt
-        printf("Artikel mit dem Namen %s wird im Porta Westfalica Lager eingelagert.\n", eingabeName);
+        printf("Artikel mit dem Namen %s wird im Porta Westfalica Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeName);
+        while (getchar() != '\n');
+        getchar();
     }
     else {
         // Fehlermeldung, mehr oder weniger sinnlos
-        printf("Unbekanntes Lager fuer Artikel mit dem Namen %s.\n", eingabeName);
+        printf("Unbekanntes Lager fuer Artikel mit dem Namen %s.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeName);
+        while (getchar() != '\n');
+        getchar();
     }
 
-    return 0;
+    return 1;
+}
+
+void strtrim(char* str) {
+    int start = 0, end;
+
+    // Leerzeichen am Anfang entfernen
+    while (isspace(str[start])) {
+        start++;
+    }
+
+    // Wenn die Zeichenkette nur aus Leerzeichen besteht
+    if (str[start] == '\0') {
+        *str = '\0';
+        return;
+    }
+
+    // Leerzeichen am Ende finden
+    end = strlen(str) - 1;
+    while (end >= start && isspace(str[end])) {
+        end--;
+    }
+
+    // Nullterminator setzen
+    str[end + 1] = '\0';
+
+    // Zeichenkette verschieben, wenn nötig
+    if (start > 0) {
+        memmove(str, str + start, end - start + 2);
+    }
 }
