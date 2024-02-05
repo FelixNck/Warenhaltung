@@ -25,10 +25,11 @@ int neuen_artikel_anlegen();
 int artikel_bearbeiten();
 int details_waehlen_bearbeitung(struct ArtikelTyp *artikel);
 int artikel_erfassen();
-int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, double artikel_hoehe, double artikel_breite, double artikel_tiefe);
-int artikel_einlagern_nach_name(char eingabeName[], int lager);
-int berechne_belegte_ids(struct Artikel artikel, int zaehler);
-int add_belegte_id(int lager, int hoehe, int id, int artikelnummer, int resthoehe);
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel);
+// artikel_einlagern_nach_name(char eingabeName[], int lager);
+int berechne_belegte_ids_Halle(struct Artikel artikel);
+int berechne_belegte_ids_Porta(struct Artikel artikel);
+void print_zugeordnete_ids(struct Artikel artikel);
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen();
@@ -642,7 +643,8 @@ int artikel_erfassen() {
                         return 0;
                     }
                     else if (wahl == '2') {
-                        artikel_einlagern_nach_name(eingabeName, artikel_liste[i].lager);
+                        //artikel_einlagern_nach_name(eingabeName, artikel_liste[i].lager);
+                        return 1;
                     }
                     break;
                 }
@@ -668,14 +670,21 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
     // Überprüfen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
-        int belegte_ids = berechne_belegte_ids(artikel, 0); // Start-Zaehlerwert
-        printf("Artikel mit der Nummer %d wird im Halle Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
+        int belegte_ids = berechne_belegte_ids_Halle(artikel);
+        if (belegte_ids != -1) {
+            print_zugeordnete_ids(artikel); // Ausgabe der zugeordneten IDs
+            printf("Artikel mit der Nummer %d wurde erfolgreich im Halle Lager eingelagert.\n", eingabeNummer);
+        }
+        else {
+            printf("Artikel mit der Nummer %d konnte nicht eingelagert werden. Keine passende Position gefunden.\n", eingabeNummer);
+        }
+        printf("Druecken Sie Enter, um weitere Aktionen auszufuehren!\n");
         while (getchar() != '\n');
         getchar();
     }
     else if (lager == 2) {
         // Aktionen für Lager 2 (PW)
-        int belegte_ids = berechne_belegte_ids(artikel, 0); // Start-Zaehlerwert
+        int belegte_ids = berechne_belegte_ids_Porta(artikel, 0); // Start-Zaehlerwert
         printf("Artikel mit der Nummer %d wird im Porta Westfalica Lager eingelagert.\nDruecken Sie Enter, um weitere Aktionen auszufuehren!\n", eingabeNummer);
         while (getchar() != '\n');
         getchar();
@@ -690,7 +699,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
     return 1;
 }
 
-int artikel_einlagern_nach_name(char eingabeName[], int lager) {
+/*int artikel_einlagern_nach_name(char eingabeName[], int lager) {
     // Überprüfen des Lagers und dann Berechnungen
     if (lager == 1) {
         // Aktionen für Lager 1 (HALLE)
@@ -712,38 +721,73 @@ int artikel_einlagern_nach_name(char eingabeName[], int lager) {
     }
 
     return 1;
-}
+}*/
 
-int berechne_belegte_ids(struct Artikel artikel, int zaehler) {
-    int start_id = 0;
+int berechne_belegte_ids_Halle(struct Artikel artikel) {
+    int start_id;
+    int i;
     int max_anzahl_halle_20 = HALLE_20 + 12000000;
     int max_anzahl_halle_40 = HALLE_40 + 14000000;
 
-    // Zugriff auf die Höhe des Artikels
+    // Zugriff auf Daten des Artikels
     double hoehe = artikel.typ.hoehe;
-    int artikelnummer = artikel.typ.art_nummer; // Zugriff auf die Artikelnummer
+    double breite = artikel.typ.breite;
+    double tiefe = artikel.typ.tiefe;
+    int artikelnummer = artikel.typ.art_nummer; 
+
+    int ids_belegt = 0; // Anzahl der belegten IDs
+
 
     if (hoehe <= 20) {
         start_id = START_ID_HALLE_20CM;
 
-        // Schleife für 20 cm hohe Artikel
-        for (int i = 0; i < max_anzahl_halle_20; i++) {
-            // Überprüfung der Positionen im Lager für 20 cm hohe Artikel
-            // Vergleich der Artikelnummer und Resthöhe
-            if (artikel.positions[i].resthöhe >= hoehe && artikel.positions[i].artikelnummer == artikelnummer) {
-                return start_id + zaehler; // Rückgabe der berechneten ID
+        // Berechnung der Anzahl der belegten IDs basierend auf Breite und Tiefe
+        ids_belegt = (int)(breite / 10); // Breite belegt breite/10 IDs
+        if (tiefe > 60) {
+            ids_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
+        }
+
+        // Schleife für 20 cm Fächer
+        for (start_id; start_id < max_anzahl_halle_20; start_id++) {
+            int available = 1;
+            for (i = 0; i < ids_belegt; i++) {
+                if (start_id + i >= max_anzahl_halle_20 || artikel.positions[start_id + i].artikelnummer != 0 || artikel.positions[start_id + i].positions_id_voll == 1) {
+                    available = 0;
+                    break;
+                }
+            }
+
+            if (available) {
+                for (i = 0; i < ids_belegt; i++) {
+                    artikel.positions[start_id + i].resthöhe -= hoehe;
+                    if (artikel.positions[start_id + i].resthöhe <= 5) {
+                        artikel.positions[start_id + i].positions_id_voll = 1;
+                    }
+                    artikel.positions[start_id + i].artikelnummer = artikelnummer;
+                }
+                return start_id; // Rückgabe der berechneten ID
+            }
+            else {
+                start_id += i; // Weiter mit der nächsten verfügbaren ID
             }
         }
     }
-    else if ((hoehe > 20) && (hoehe <= 40)) {
+    else if ((hoehe > 20) && (hoehe <= 40)) {   // oder wenn alle posIDs halle_20 voll sind ?? !
         start_id = START_ID_HALLE_40CM;
 
-        // Schleife für 40 cm hohe Artikel
-        for (int i = 0; i < max_anzahl_halle_40; i++) {
-            // Überprüfung der Positionen im Lager für 40 cm hohe Artikel
-            // Vergleich der Artikelnummer und Resthöhe
-            if (artikel.positions[i].resthöhe >= hoehe && artikel.positions[i].artikelnummer == artikelnummer) {
-                return start_id + zaehler; // Rückgabe der berechneten ID
+        // Schleife für 40 cm Fächer
+        for (start_id; start_id < max_anzahl_halle_40; start_id++) {
+            if (artikel.positions[start_id].artikelnummer != 0 || artikel.positions[start_id].positions_id_voll == 1) {
+                continue; // Überspringe belegte IDs
+            }
+
+            if (artikel.positions[start_id].resthöhe >= hoehe) {
+                artikel.positions[start_id].resthöhe -= hoehe;
+                if (artikel.positions[start_id].resthöhe <= 5) {
+                    artikel.positions[start_id].positions_id_voll = 1;
+                }
+                artikel.positions[start_id].artikelnummer = artikelnummer;
+                return start_id; // Rückgabe der berechneten ID
             }
         }
     }
@@ -752,45 +796,21 @@ int berechne_belegte_ids(struct Artikel artikel, int zaehler) {
     return -1;
 }
 
+berechne_belegte_ids_Porta() {
+    int start_id = 0;
+    int max_anzahl_porta_20 = PORTA_20 + 22000000;
+    int max_anzahl_porta_40 = PORTA_40 + 2400000;
+    int max_anzahl_porta_80 = PORTA_80 + 2800000;
 
-// Funktion zum Hinzufügen einer belegten ID in das entsprechende Array basierend auf Lager und Höhe
-int add_belegte_id(int lager, int hoehe, int id, int artikelnummer, int resthoehe) {
+}
+
+// Funktion zur Ausgabe aller zugeordneten IDs
+void print_zugeordnete_ids(struct Artikel artikel) {    // aktuell werden noch falsche IDs ausgegeben, da Startwert 0 ist !!
     int i;
-    int max_anzahl_Halle_20 = HALLE_20 + 12000000;
-    int max_anzahl_Halle_40 = HALLE_40 + 14000000;
-    int max_anzahl_Porta_20 = PORTA_20 + 22000000;
-    int max_anzahl_Porta_40 = PORTA_40 + 2400000;
-    int max_anzahl_Porta_80 = PORTA_80 + 2800000;
-    if (lager == 1) { // Halle
-        if (hoehe <= 20) {
-            for (i = 0; i < max_anzahl_Halle_20; i++) {
-                if (belegte_id_halle_20[i] == -1) {
-                    belegte_id_halle_20[i] = id;
-                    break;
-                }
-            }
-        }
-        else if ((hoehe > 20) && (hoehe <= 40)) {
-            for (int i = 0; i < HALLE_40; i++) {
-                if (belegte_id_halle_40[i] == -1) {
-                    belegte_id_halle_40[i] = id;
-                    break;
-                }
-            }
-        }
+    printf("Zugeordnete IDs fuer Artikelnummer %d:\n", artikel.typ.art_nummer);
+    for (i = 0; i < artikel.num_positions; i++) {
+        printf("ID: %d\n", artikel.positions[i].id);
     }
-    else if (lager == 2) { // Porta
-        if (hoehe <= 20) {
-            for (int i = 0; i < PORTA_20; i++) {
-                if (belegte_id_porta_20[i] == -1) {
-                    belegte_id_porta_20[i] = id;
-                    break;
-                }
-            }
-        }
-        // Weitere Fälle 
-    }
-    // Weitere Fälle
 }
 
 void strtrim(char* str) {
