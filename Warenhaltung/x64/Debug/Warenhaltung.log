@@ -1,8 +1,28 @@
 ﻿  main.c
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(611,50): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(615,94): error C2440: "Funktion": "Artikel" kann nicht in "double" konvertiert werden
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(615,94): warning C4024: "artikel_einlagern_nach_nummer": unterschiedliche Typen für formalen und übergebenen Parameter 3
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(615,25): error C2198: "artikel_einlagern_nach_nummer": Nicht genügend Argumente für Aufruf.
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(667,80): warning C4028: Formaler Parameter "3" unterscheidet sich von der Deklaration
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(667,89): warning C4029: Deklarierte Liste formaler Parameter weicht von der Definition ab
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(811,23): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(594,32): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(658,19): warning C4047: "!=": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(673,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,43): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,43): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,48): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,48): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,97): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,97): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,102): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,102): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(715,57): warning C4020: "berechne_belegte_ids_Porta": zu viele übergebene Parameter
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(785,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(811,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(867,2): warning C4047: "return": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(871,30): warning C4026: Funktion mit Liste formaler Parameter deklariert
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(907,20): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(556): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(538): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(877): warning C4716: "berechne_belegte_ids_Porta": Muss einen Wert zurückgeben
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(823): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
+C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(861): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
+  Warenhaltung.vcxproj -> C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\x64\Debug\Warenhaltung.exe
