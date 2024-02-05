@@ -1,5 +1,8 @@
 ﻿  main.c
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(699,23): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(529): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(547): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
-  Warenhaltung.vcxproj -> C:\Users\Jana\source\repos\Warenhaltung\x64\Debug\Warenhaltung.exe
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(611,50): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(615,94): error C2440: "Funktion": "Artikel" kann nicht in "double" konvertiert werden
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(615,94): warning C4024: "artikel_einlagern_nach_nummer": unterschiedliche Typen für formalen und übergebenen Parameter 3
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(615,25): error C2198: "artikel_einlagern_nach_nummer": Nicht genügend Argumente für Aufruf.
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(667,80): warning C4028: Formaler Parameter "3" unterscheidet sich von der Deklaration
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(667,89): warning C4029: Deklarierte Liste formaler Parameter weicht von der Definition ab
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(811,23): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
