@@ -766,15 +766,14 @@ int * berechne_belegte_ids_Halle(struct Artikel artikel) {
 
 	int ids_von_artikel_belegt = 0; // Anzahl der belegten IDs
 
+	// Berechnung der Anzahl der belegten IDs basierend auf Breite und Tiefe
+	ids_von_artikel_belegt = (int)(breite / 10); // Breite belegt breite/10 IDs
+	if (tiefe > 60) {
+		ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
+	}
 
 	if (hoehe <= 20) {
 		start_id = START_ID_HALLE_20CM;
-
-		// Berechnung der Anzahl der belegten IDs basierend auf Breite und Tiefe
-		ids_von_artikel_belegt = (int)(breite / 10); // Breite belegt breite/10 IDs
-		if (tiefe > 60) {
-			ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
-		}
 
 		for (aktuelle_id = start_id; start_id < max_anzahl_halle_20; aktuelle_id++) {
 			int available = 0;
@@ -827,12 +826,6 @@ int * berechne_belegte_ids_Halle(struct Artikel artikel) {
 	}
 	else if ((hoehe > 20) && (hoehe <= 40)) {   // oder wenn alle posIDs halle_20 voll sind ?? !
 		start_id = START_ID_HALLE_40CM;
-
-		// Berechnung der Anzahl der belegten IDs basierend auf Breite und Tiefe
-		ids_von_artikel_belegt = (int)(breite / 10); // Breite belegt breite/10 IDs
-		if (tiefe > 60) {
-			ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
-		}
 
 		for (aktuelle_id = start_id; start_id < max_anzahl_halle_40; aktuelle_id++) {
 			int available = 0;
