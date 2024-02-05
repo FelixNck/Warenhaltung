@@ -834,22 +834,42 @@ int * berechne_belegte_ids_Halle(struct Artikel artikel) {
 			ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
 		}
 
-		for (aktuelle_id = start_id; start_id < max_anzahl_halle_20; aktuelle_id++) {
+		for (aktuelle_id = start_id; start_id < max_anzahl_halle_40; aktuelle_id++) {
 			int available = 0;
 			// Überprüfen, ob aktuelle ID (start_id + i) schon in der Liste belegte_id_halle_20 vorhanden ist
 			// wenn ja, dann springe zur nächsten ID
 			// wenn nicht, dann kann die aktuelle ID potentiell genommen werden
 			for (i = 0; i <= sizeof(belegte_id_halle_40); i++) {
-				if (belegte_id_halle_40[i].id == aktuelle_id) {
+				if (belegte_id_halle_40[i].id == NULL) {
+					available = 1;
 					break;
 				}
-				available = 1;
+				else {
+					if (strcmp(belegte_id_halle_40[i].id, aktuelle_id) == 0) {
+						if (belegte_id_halle_40[i].artikelnummer == artikel.typ.art_nummer) {
+							if (belegte_id_halle_40[i].positions_id_voll == 1) {
+								continue;
+							}
+							else if (belegte_id_halle_40[i].resthoehe >= artikel.typ.hoehe) {
+								available = 1;
+								break;
+							}
+						}
+						else {
+							continue;
+						}
+					}
+				}
 			}
 			// aktuelle ID ist potentiell möglich
 			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				for (i = 1; i < ids_von_artikel_belegt; i++) {
 					int nachfolgende_id = aktuelle_id + i;
+					if (belegte_id_halle_40[i].id == NULL) {
+						available = 1;
+						break;
+					}
 					if (belegte_id_halle_40[aktuelle_id + i].id != 0) {
 						available = 0;
 						break;
@@ -857,7 +877,7 @@ int * berechne_belegte_ids_Halle(struct Artikel artikel) {
 				}
 				// Erstellt eine neue PositionsID mit der aktuellen_id
 				if (available == 1) {
-					int belegte_ids[2] = { start_id, ids_von_artikel_belegt };
+					int belegte_ids[2] = { aktuelle_id, ids_von_artikel_belegt };
 					return belegte_ids;
 				}
 			}
