@@ -91,9 +91,9 @@ else if ((hoehe > 20) && (hoehe <= 40))
 
 struct PositionsID {
 	int id;
-	int resthöhe;
+	int resthoehe;
 	int positions_id_voll;
-	int inventarnummer; // Inventarnummer an dieser Position
+	int artikelnummer; // Artikelnummer an dieser Position
 };
 
 struct ArtikelTyp {
@@ -658,17 +658,26 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 		if (belegte_ids != -1) {
 			int start_id = belegte_ids[0];
 			int anzahl_weiterer_belegter_ids = belegte_ids[1];
+			int resthoehe = 0;
+
 			// Für jede vom Artikel belegte ID einen struct anlegen
 			for (int i = 0; i <= anzahl_weiterer_belegter_ids; i++) {
-				int belegte_id = start_id + i;
-				struct PositionsID positions_id;
-				positions_id.id = belegte_id;
-				positions_id.inventarnummer = artikel.inventarnummer;
-				positions_id.positions_id_voll = 0;
-				positions_id.resthöhe = 40 - artikel.typ.hoehe;
+				if (strcmp(belegte_id_halle_20[i], aktuelle_id) != 0 && strcmp(belegte_id_halle_40[i], aktuelle_id) != 0) {
+					int belegte_id = start_id + i;
+					struct PositionsID positions_id;
+					positions_id.id = belegte_id;
+					positions_id.artikelnummer = artikel.typ.art_nummer;
+					positions_id.positions_id_voll = 0;
+					positions_id.resthoehe =;
 
-				// hinzufügen der jetzt belegten IDs an die stelle in belegte_id_halle_20 Array
-				// PositionsIDs an Artikel schreiben
+					printf("Artikel Nummer: %d", artikel.typ.art_nummer);
+					printf("PositionsID Aritkelnummer: %d", positions_id.artikelnummer);
+					// hinzufügen der jetzt belegten IDs an die stelle in belegte_id_halle_20 Array
+					// PositionsIDs an Artikel schreiben
+				}
+				else {
+					// Verknüpfe Artikel mit PositionsID
+				}
 			}
 			
 			print_zugeordnete_ids(artikel); // Ausgabe der zugeordneten IDs
@@ -724,6 +733,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 
 int berechne_belegte_ids_Halle(struct Artikel artikel) {
 	int start_id;
+	int aktuelle_id;
 	int i;
 	int max_anzahl_halle_20 = HALLE_20 + 12000000;
 	int max_anzahl_halle_40 = HALLE_40 + 14000000;
@@ -746,21 +756,31 @@ int berechne_belegte_ids_Halle(struct Artikel artikel) {
 			ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
 		}
 
-		for (int aktuelle_id = start_id; start_id < max_anzahl_halle_20; aktuelle_id++) {
+		for (aktuelle_id = start_id; start_id < max_anzahl_halle_20; aktuelle_id++) {
 			int available = 0;
 			// Überprüfen, ob aktuelle ID (start_id + i) schon in der Liste belegte_id_halle_20 vorhanden ist
 			// wenn ja, dann springe zur nächsten ID
 			// wenn nicht, dann kann die aktuelle ID potentiell genommen werden
-			for (int i = 0; i <= sizeof(belegte_id_halle_20); i++) {
-				if (belegte_id_halle_20[i] == aktuelle_id) {
-					break;
+			for (i = 0; i <= sizeof(belegte_id_halle_20); i++) {
+				if (strcmp(belegte_id_halle_20[i], aktuelle_id) == 0) {
+					if (belegte_id_halle_20[i].artikelnummer == artikel.typ.art_nummer) {
+						if (belegte_id_halle_20[i].positions_id_voll == 1) {
+							continue;
+						}
+						else if (belegte_id_halle_20[i].resthoehe >= artikel.typ.hoehe) {
+							available = 1;
+							break;
+						}
+					}
+					else {
+						continue;
+					}
 				}
-				available = 1;
 			}
 			// aktuelle ID ist potentiell möglich
 			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
-				for (int i = 1; i < ids_von_artikel_belegt; i++) {
+				for (i = 1; i < ids_von_artikel_belegt; i++) {
 					int nachfolgende_id = aktuelle_id + i;
 					if (belegte_id_halle_20[aktuelle_id + i] != 0) {
 						available = 0;
@@ -769,7 +789,7 @@ int berechne_belegte_ids_Halle(struct Artikel artikel) {
 				}
 				// Erstellt eine neue PositionsID mit der aktuellen_id
 				if (available == 1) {
-					int belegte_ids[2] = { start_id, ids_von_artikel_belegt };
+					int belegte_ids[2] = { aktuelle_id, ids_von_artikel_belegt };
 					return belegte_ids;
 				}
 			}
@@ -784,12 +804,12 @@ int berechne_belegte_ids_Halle(struct Artikel artikel) {
 			ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
 		}
 
-		for (int aktuelle_id = start_id; start_id < max_anzahl_halle_20; aktuelle_id++) {
+		for (aktuelle_id = start_id; start_id < max_anzahl_halle_20; aktuelle_id++) {
 			int available = 0;
 			// Überprüfen, ob aktuelle ID (start_id + i) schon in der Liste belegte_id_halle_20 vorhanden ist
 			// wenn ja, dann springe zur nächsten ID
 			// wenn nicht, dann kann die aktuelle ID potentiell genommen werden
-			for (int i = 0; i <= sizeof(belegte_id_halle_40); i++) {
+			for (i = 0; i <= sizeof(belegte_id_halle_40); i++) {
 				if (belegte_id_halle_40[i] == aktuelle_id) {
 					break;
 				}
@@ -798,7 +818,7 @@ int berechne_belegte_ids_Halle(struct Artikel artikel) {
 			// aktuelle ID ist potentiell möglich
 			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
-				for (int i = 1; i < ids_von_artikel_belegt; i++) {
+				for (i = 1; i < ids_von_artikel_belegt; i++) {
 					int nachfolgende_id = aktuelle_id + i;
 					if (belegte_id_halle_40[aktuelle_id + i] != 0) {
 						available = 0;
