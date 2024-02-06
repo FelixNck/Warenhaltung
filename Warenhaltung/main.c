@@ -730,7 +730,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 	int start_id;
 	int aktuelle_id;
 	int i;
-	int max_anzahl_halle_20 = HALLE_20 + 12000000; // 12018000
+	int max_anzahl_halle_20 = HALLE_20 + 12000000;
 	int max_anzahl_halle_40 = HALLE_40 + 14000000;
 
 	// Zugriff auf Daten des Artikels
@@ -738,8 +738,8 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 	double breite = artikel.typ.breite;
 	double tiefe = artikel.typ.tiefe;
 	int artikelnummer = artikel.typ.art_nummer;
-	int lager_halle_20_cm_voll = 0;
-
+	
+	int lager_halle_20_cm_voll = 0; // Flag, ob Lagerplatz mit 20cm hohen Fächern voll ist
 	int ids_von_artikel_belegt = 0; // Anzahl der vom Artikel belegten IDs
 
 	// Berechnung der Anzahl der vom Artikel belegten IDs basierend auf Breite und Tiefe
@@ -867,7 +867,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 			// aktuelle ID ist potentiell möglich
 			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
-				int aktuelle_id_index = aktuelle_id - 12000000;
+				int aktuelle_id_index = aktuelle_id - 14000000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
 				for (id_index_zaheler = aktuelle_id_index; id_index_zaheler <= letzte_belegte_id; id_index_zaheler++) {
@@ -892,7 +892,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 				if (available == 1) {
 					// Für jede vom Artikel belegte ID einen struct anlegen
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
-						aktuelle_id = aktuelle_id_index + 12000000;
+						aktuelle_id = aktuelle_id_index + 14000000;
 
 						struct PositionsID positions_id;
 						positions_id.id = aktuelle_id;
