@@ -1,41 +1,67 @@
 ﻿  main.c
-<<<<<<< HEAD
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(594,32): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(658,19): warning C4047: "!=": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(673,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,43): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,43): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,48): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,48): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,97): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,97): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,102): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(686,102): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(715,57): warning C4020: "berechne_belegte_ids_Porta": zu viele übergebene Parameter
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(785,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(790,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(811,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(867,2): warning C4047: "return": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(871,30): warning C4026: Funktion mit Liste formaler Parameter deklariert
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(907,20): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(556): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(538): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(877): warning C4716: "berechne_belegte_ids_Porta": Muss einen Wert zurückgeben
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(823): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
-C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\Warenhaltung\main.c(861): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
-  Warenhaltung.vcxproj -> C:\Users\felix\Documents\Programming\Prüfung\Warenhaltung\x64\Debug\Warenhaltung.exe
-=======
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(612,50): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(687,63): warning C4020: "berechne_belegte_ids_Porta": zu viele übergebene Parameter
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(762,66): warning C4244: "-=": Konvertierung von "double" in "int", möglicher Datenverlust
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(785,58): warning C4244: "-=": Konvertierung von "double" in "int", möglicher Datenverlust
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(799,30): warning C4026: Funktion mit Liste formaler Parameter deklariert
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(831,23): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(550): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(568): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(805): warning C4716: "berechne_belegte_ids_Porta": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(594,32): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(659,19): warning C4047: "!=": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(673,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,49): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,49): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,100): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,100): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,105): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(686,105): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(718,19): warning C4047: "!=": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(732,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,49): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,49): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,100): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,100): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,105): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,105): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,156): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,156): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,161): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(745,161): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(830,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(835,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(835,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(835,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(835,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(856,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(882,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(887,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(887,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(887,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(887,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(908,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(926,2): warning C4047: "return": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(961,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(966,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(966,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(966,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(966,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(987,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1013,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1018,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1018,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1018,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1018,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1039,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1065,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1070,39): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1070,39): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 1
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1070,44): warning C4047: "Funktion": Anzahl der Dereferenzierungen bei "const char *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1070,44): warning C4024: "strcmp": unterschiedliche Typen für formalen und übergebenen Parameter 2
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1091,36): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1109,2): warning C4047: "return": Anzahl der Dereferenzierungen bei "int *" und "int" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1141,20): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(538): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(556): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(868): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(920): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(999): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1051): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1103): warning C4172: Adresse einer lokalen Variablen oder eines temporären Werts ": belegte_ids" wird zurückgegeben
   Warenhaltung.vcxproj -> C:\Users\Jana\source\repos\Warenhaltung\x64\Debug\Warenhaltung.exe
->>>>>>> .
