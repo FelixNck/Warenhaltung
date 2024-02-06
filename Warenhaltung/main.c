@@ -207,7 +207,7 @@ int menue() {
 
 int neuen_artikel_anlegen() {
 	struct ArtikelTyp artikeltyp;
-	int lagerwahl = 0;
+	int lagerwahl = -1;
 	int wahl = 0;
 	int i;
 
@@ -250,19 +250,42 @@ int neuen_artikel_anlegen() {
 	printf("\nPreis (in EUR): ");
 	scanf("%lf", &artikeltyp.preis);
 
-	printf("\nHoehe (in cm): ");
-	scanf("%lf", &artikeltyp.hoehe);
+	do {
+		printf("\nHoehe (in cm; wenn verderblich <= 40, sonst <= 80): ");
+		scanf("%lf", &artikeltyp.hoehe);
+		if (artikeltyp.hoehe > 80)
+			printf("Fehler: Falsche Hoehe! Geben Sie bitte eine gueltige Hoehe ein!\n");
+	} while (artikeltyp.hoehe > 80);
 
-	printf("\nBreite (in cm): ");
-	scanf("%lf", &artikeltyp.breite);
+	do {
+		printf("\nBreite (in cm, <= 300): ");
+		scanf("%lf", &artikeltyp.breite);
+		if (artikeltyp.breite > 300)
+			printf("Fehler: Die Breite darf nicht groesser als 300 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
+	} while (artikeltyp.breite > 300);
 
-	printf("\nTiefe (in cm): ");
-	scanf("%lf", &artikeltyp.tiefe);
+	do {
+		printf("\nTiefe (in cm, <= 120): ");
+		scanf("%lf", &artikeltyp.tiefe);
+		if (artikeltyp.tiefe > 120)
+			printf("Fehler: Die Tiefe darf nicht groesser als 120 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
+	} while (artikeltyp.tiefe > 120);
 
 
-	printf("\nWeisen Sie dem Artikel nun noch zu, ob er verderblich ist oder nicht.\nVerderblich: (1)\nNicht verderblich: (2)\n");
-	// Eingabe für die Art des Artikels (verderblich oder nicht)
-	scanf("%d", &lagerwahl);
+	do {
+		printf("\nWeisen Sie dem Artikel nun noch zu, ob er verderblich ist oder nicht.\nVerderblich: (1)\nNicht verderblich: (2)\n");
+		scanf("%d", &lagerwahl);
+		if (artikeltyp.hoehe > 40 && lagerwahl == HALLE) {
+			printf("Fehler: Artikel mit einer Hoehe ueber 40 cm koennen nicht in Halle an der Saale eingelagert werden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
+			getchar(); // Eingabepuffer leeren
+			getchar(); // Warten, bis der Benutzer fortfährt
+			return 0;
+		}
+		else if (lagerwahl != HALLE && lagerwahl != PORTA_WESTFALICA) {
+			printf("Fehler: Ungueltige Eingabe. Bitte waehlen Sie eine der angegebenen Optionen.\n");
+		}
+	} while (lagerwahl != HALLE && lagerwahl != PORTA_WESTFALICA);
+
 
 	switch (lagerwahl) {
 	case HALLE:
