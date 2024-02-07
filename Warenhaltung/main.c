@@ -26,7 +26,7 @@ int artikel_bearbeiten();
 int details_waehlen_bearbeitung(struct ArtikelTyp* artikel);
 int artikel_loeschen();
 int artikel_erfassen();
-int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel *artikel);
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel);
 // artikel_einlagern_nach_name(char eingabeName[], int lager);
 int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel);
 int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel);
@@ -732,14 +732,12 @@ int artikel_erfassen() {
 
 						struct ArtikelTyp *artikel_typ_pntr;
 						artikel_typ_pntr = &artikel_liste[i];
-						
-						struct Artikel *artikel_pntr;
-						struct Artikel artikel;
-						artikel_pntr = &artikel;
-						artikel_pntr->typ = artikel_typ_pntr;
-						artikel_pntr->inventarnummer = generiere_inventarnummer(); // Hier wird die Inventarnummer generiert und zugewiesen
 
-						artikel_einlagern_nach_nummer(eingabeNummer, artikel_liste[i].lager, artikel_pntr);
+						struct Artikel artikel;
+						artikel.typ = artikel_typ_pntr;
+						artikel.inventarnummer = generiere_inventarnummer(); // Hier wird die Inventarnummer generiert und zugewiesen
+
+						artikel_einlagern_nach_nummer(eingabeNummer, artikel_liste[i].lager, artikel);
 						break;
 					}
 				}
@@ -792,15 +790,20 @@ int generiere_inventarnummer() {
 	return ++inventarnummerZaehler;
 }
 
-int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel *artikel_pntr) {
+int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel) {
 	int i;
+
+	struct Artikel *artikel_pntr;
+	artikel_pntr = &artikel;
 
 	// Überprüfen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
 	if (lager == 1) {
 		// Aktionen für Lager 1 (HALLE)
 		if (lagere_artikel_an_positions_ids_Halle(artikel_pntr) != -1) {
 			
-			printf("PositionsID %d\n", artikel_pntr->positions[0].id);
+
+			printf("PositionsID %s\n", artikel_pntr->typ->name);
+			printf("PositionsID %d\n", artikel_pntr->positions[2].id);
 			while (getchar() != '\n');
 			getchar();
 			
@@ -951,6 +954,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						aktuelle_id = aktuelle_id_index + 12000000;
 
 						if (belegte_ids_halle_20[aktuelle_id_index].id == NULL) {
+							int k;
 							struct PositionsID positions_id;
 							positions_id.id = aktuelle_id;
 							positions_id.artikelnummer = artikel->typ->art_nummer;
@@ -967,7 +971,22 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 
 							// Der Pointer zeigt jetzt auf die erstellte PositionsID und soll in das Array positions an den Artikel gehangen werden
 							belegte_ids_halle_20[aktuelle_id_index] = positions_id;
+							
+							for (k = 0; k < 60; k++) {
+								printf("PositionsID bei k: %d\n", artikel->positions[k].id);
+								printf("PositionsID Artikelnummer bei k: %d\n", artikel->positions[k].artikelnummer);
+								while (getchar() != '\n');
+								getchar();
+								if (artikel->positions[k].artikelnummer == 0) {
+									
+									break;
+								}
+							}
+
 							artikel->positions[aktuelle_id_index] = positions_id;
+							printf("PositionsID unten%d\n", artikel->positions[aktuelle_id_index].id);
+							while (getchar() != '\n');
+							getchar();
 						}
 						else {
 							struct PositionsID positions_id = belegte_ids_halle_20[aktuelle_id_index];
