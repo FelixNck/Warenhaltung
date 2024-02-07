@@ -29,7 +29,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 // artikel_einlagern_nach_name(char eingabeName[], int lager);
 int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel);
 int lagere_artikel_an_positions_ids_Porta(struct Artikel artikel);
-void print_zugeordnete_ids(struct Artikel artikel);
+int print_zugeordnete_ids(struct Artikel artikel);
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(struct ArtikelTyp* artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
@@ -110,6 +110,7 @@ struct Artikel {
 	struct ArtikelTyp typ;
 	int inventarnummer;
 	struct PositionsID* positions[60]; // Pointer auf PositionsID
+	int anzahl_positions_ids;
 };
 
 struct Lager {
@@ -812,15 +813,29 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
 						aktuelle_id = aktuelle_id_index + 12000000;
 
+						// Prüfe, ob das Array nicht voll ist
+						if (artikel.anzahl_positions_ids >= 60) {
+							// Fehlerbehandlung, wenn das Array voll ist
+							return -1;
+						}
+
 						struct PositionsID positions_id;
 						positions_id.id = aktuelle_id;
 						positions_id.artikelnummer = artikel.typ.art_nummer;
 						positions_id.positions_id_voll = 0;
-						positions_id.resthoehe = 0;;
+						
+						// Berechnung der Resthöhe
+						double resthoehe = belegte_ids_halle_20[aktuelle_id_index].resthoehe - artikel.typ.hoehe;
 
-						// Resthöhe berechnen und zuweisen
-						// Positions_ID_voll setzen
-						// PositionsIDs an Artikel schreiben
+						// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+						if (resthoehe <= 5) {
+							positions_id.positions_id_voll = 1;
+						}
+						positions_id.resthoehe = resthoehe;
+
+
+						// Inkrementiere die Anzahl der Positions-IDs
+						artikel.anzahl_positions_ids++;	//funktioniert nicht wirklich, zählt nicht
 					}
 					return 0;
 				}
@@ -898,11 +913,19 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 						positions_id.positions_id_voll = 0;
 						positions_id.resthoehe = 0;;
 
-						belegte_ids_halle_40[aktuelle_id_index] = positions_id;
+						belegte_ids_halle_40[aktuelle_id_index] = positions_id;	//gibts nicht bei 20?
 
-						// Resthöhe berechnen und zuweisen
-						// Positions_ID_voll setzen
-						// PositionsIDs an Artikel schreiben
+						// Berechnung der Resthöhe
+						double resthoehe = belegte_ids_halle_20[aktuelle_id_index].resthoehe - artikel.typ.hoehe;
+
+						// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+						if (resthoehe <= 5) {
+							positions_id.positions_id_voll = 1;
+						}
+						positions_id.resthoehe = resthoehe;
+
+						// Füge Positions-IDs zum Array der Artikel-Positions-IDs hinzu
+
 					}
 					return 0;
 				}
@@ -1190,12 +1213,16 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel artikel) {
 
 
 // Funktion zur Ausgabe aller zugeordneten IDs
-void print_zugeordnete_ids(struct Artikel artikel) {    // aktuell werden noch falsche IDs ausgegeben, da Startwert 0 ist !!
-	int i;
-	printf("Zugeordnete IDs fuer Artikelnummer %d:\n", artikel.typ.art_nummer);
-	//for (i = 0; i < artikel.num_positions; i++) {
-	//	printf("ID: %d\n", artikel.positions[i].id);
-	// }
+int print_zugeordnete_ids(struct Artikel artikel) {
+	printf("Eingelagerter Artikel:\n");
+	printf("Artikelnummer: %d\n", artikel.typ.art_nummer);
+	printf("Inventarnummer: %d\n", artikel.inventarnummer);
+	printf("Anzahl der zugeordneten IDs: %d\n", artikel.anzahl_positions_ids);
+
+	printf("Zugeordnete IDs:\n");
+	for (int i = 0; i < artikel.anzahl_positions_ids; i++) {	//gibt falschen wert aus und demnach auch keine IDs
+		printf("ID %d: %d\n", i + 1, artikel.positions[i]->id);
+	}
 }
 
 void bs_loeschen(void) {
