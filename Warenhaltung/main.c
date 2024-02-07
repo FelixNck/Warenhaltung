@@ -836,6 +836,8 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel artikel) {
 
 						// Inkrementiere die Anzahl der Positions-IDs
 						artikel.anzahl_positions_ids++;	//funktioniert nicht wirklich, zählt nicht
+
+						//Zuweisung zu Artikel; hatte ich versucht, dann aber nur alles kaputt und rueckgaengig gemacht
 					}
 					return 0;
 				}
