@@ -1,22 +1,22 @@
 ﻿  main.c
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(616,32): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(674,6): warning C4101: "i": Unreferenzierte lokale Variable
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(761,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(793,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(834,32): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(857,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(889,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(927,32): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(733,6): warning C4101: "i": Unreferenzierte lokale Variable
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(976,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1008,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1058,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1090,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1140,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1172,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(945,6): warning C4101: "i": Unreferenzierte lokale Variable
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1249,20): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(560): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(578): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
-C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1228): warning C4716: "print_zugeordnete_ids": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(732,32): warning C4013: "generiere_inventarnummer" undefiniert; Annahme: extern mit Rückgabetyp int
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(790,6): warning C4101: "i": Unreferenzierte lokale Variable
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(877,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(909,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(950,32): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(973,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1005,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1043,32): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(849,6): warning C4101: "i": Unreferenzierte lokale Variable
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1092,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1124,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1174,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1206,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1256,35): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1288,52): warning C4047: "==": Anzahl der Dereferenzierungen bei "int" und "void *" unterschiedlich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1061,6): warning C4101: "i": Unreferenzierte lokale Variable
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1365,20): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(676): warning C4716: "vorhandene_artikel_ansehen": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(694): warning C4716: "lager_aktualisieren": Muss einen Wert zurückgeben
+C:\Users\Jana\source\repos\Warenhaltung\Warenhaltung\main.c(1344): warning C4716: "print_zugeordnete_ids": Muss einen Wert zurückgeben
   Warenhaltung.vcxproj -> C:\Users\Jana\source\repos\Warenhaltung\x64\Debug\Warenhaltung.exe

@@ -24,6 +24,7 @@ int menue();
 int neuen_artikel_anlegen();
 int artikel_bearbeiten();
 int details_waehlen_bearbeitung(struct ArtikelTyp* artikel);
+int artikel_loeschen();
 int artikel_erfassen();
 int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel);
 // artikel_einlagern_nach_name(char eingabeName[], int lager);
@@ -159,6 +160,9 @@ int main(void) {
 			break;
 		case 2:
 			artikel_bearbeiten();
+			break;
+		case 3:
+			artikel_loeschen();
 			break;
 		case 4:
 			artikel_erfassen();
@@ -506,6 +510,118 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 
 	return 0;
 }
+
+int artikel_loeschen() {
+	int artikel_nummer;
+	int i;
+
+	bs_loeschen();
+
+	printf("Geben Sie die Artikelnummer des zu loeschenden Artikels ein: ");
+	scanf("%d", &artikel_nummer);
+
+	// Sucht nach dem Artikel in den Lagerlisten und löscht ihn, wenn j
+	for (i = 0; i < halle_lager.anzahl_artikel; i++) {
+		if (halle_lager.artikel_liste[i].art_nummer == artikel_nummer) {
+			// Artikel gefunden, zeigt die Details an
+			printf("\nArtikel Details:\n");
+			printf("Name: %s\n", halle_lager.artikel_liste[i].name);
+			printf("Artikelnummer: %d\n", halle_lager.artikel_liste[i].art_nummer);
+			printf("Preis: %.2f EUR\n", halle_lager.artikel_liste[i].preis);
+			printf("Hoehe: %.2f cm\n", halle_lager.artikel_liste[i].hoehe);
+			printf("Breite: %.2f cm\n", halle_lager.artikel_liste[i].breite);
+			printf("Tiefe: %.2f cm\n", halle_lager.artikel_liste[i].tiefe);
+
+			// Bestätigung vom Benutzer einholen
+			char antwort;
+			printf("Moechten Sie diesen Artikel wirklich loeschen? (j/n): ");
+			scanf(" %c", &antwort);
+
+			if (antwort == 'j' || antwort == 'J') {
+				// Artikel löschen aus Lager in Halle
+				for (int j = i; j < halle_lager.anzahl_artikel - 1; j++) {
+					halle_lager.artikel_liste[j] = halle_lager.artikel_liste[j + 1];
+				}
+				halle_lager.anzahl_artikel--;
+
+				// Artikel aus Artikelliste löschen
+				for (int k = 0; k < anzahl_artikel; k++) {
+					if (artikel_liste[k].art_nummer == artikel_nummer) {
+						for (int l = k; l < anzahl_artikel - 1; l++) {
+							artikel_liste[l] = artikel_liste[l + 1];
+						}
+						anzahl_artikel--;
+						break;
+					}
+				}
+
+				printf("Artikel erfolgreich geloescht.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return 1;
+			}
+			else {
+				printf("Loeschvorgang abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return 0;
+			}
+		}
+	}
+
+	for (i = 0; i < porta_lager.anzahl_artikel; i++) {
+		if (porta_lager.artikel_liste[i].art_nummer == artikel_nummer) {
+			// Artikel gefunden, zeigt die Details an
+			printf("\nArtikel Details:\n");
+			printf("Name: %s\n", porta_lager.artikel_liste[i].name);
+			printf("Artikelnummer: %d\n", porta_lager.artikel_liste[i].art_nummer);
+			printf("Preis: %.2f EUR\n", porta_lager.artikel_liste[i].preis);
+			printf("Hoehe: %.2f cm\n", porta_lager.artikel_liste[i].hoehe);
+			printf("Breite: %.2f cm\n", porta_lager.artikel_liste[i].breite);
+			printf("Tiefe: %.2f cm\n", porta_lager.artikel_liste[i].tiefe);
+
+			// Bestätigung vom Benutzer einholen
+			char antwort;
+			printf("Moechten Sie diesen Artikel wirklich loeschen? (j/n): ");
+			scanf(" %c", &antwort);
+
+			if (antwort == 'j' || antwort == 'J') {
+				// Artikel löschen aus Lager PW
+				for (int j = i; j < porta_lager.anzahl_artikel - 1; j++) {
+					porta_lager.artikel_liste[j] = porta_lager.artikel_liste[j + 1];
+				}
+				porta_lager.anzahl_artikel--;
+
+				// Artikel aus Artikelliste (wo alle Artikel drin stehen) löschen
+				for (int k = 0; k < anzahl_artikel; k++) {
+					if (artikel_liste[k].art_nummer == artikel_nummer) {
+						for (int l = k; l < anzahl_artikel - 1; l++) {
+							artikel_liste[l] = artikel_liste[l + 1];
+						}
+						anzahl_artikel--;
+						break;
+					}
+				}
+
+				printf("Artikel erfolgreich geloescht.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return 1;
+			}
+			else {
+				printf("Loeschvorgang abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return 0;
+			}
+		}
+	}
+
+	// Artikel nicht gefunden
+	printf("Artikel mit der Nummer %d wurde nicht gefunden.\n", artikel_nummer);
+	return 0;
+}
+
 
 // Funktion zum Anzeigen der vorhandenen Artikel und gleichzeitigen Aktualisierung des Lagerbestands
 int vorhandene_artikel_ansehen() {
