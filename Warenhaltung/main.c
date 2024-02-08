@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #define HALLE_20 18000//vorhandene Anzahl Positions IDs für 20cm hohe Fächer
 #define HALLE_40 54000
@@ -21,13 +20,13 @@
 #define MAX_ARTIKEL 400
 
 int menue();
+double berechne_belegung_von(int);
 int neuen_artikel_typ_anlegen();
 int artikel_typ_bearbeiten();
 int details_waehlen_bearbeitung(struct ArtikelTyp* artikel);
-int artikel_loeschen();
+int artikel_typ_loeschen();
 int artikel_erfassen();
 int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel);
-// artikel_einlagern_nach_name(char eingabeName[], int lager);
 int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel);
 int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel);
 int print_zugeordnete_ids(struct Artikel *artikel);
@@ -53,6 +52,7 @@ struct ArtikelTyp {
 	double breite;
 	double tiefe;
 	int lager;
+	int artikel_davon_im_lager;
 };
 
 // ein Artikel verbraucht einen bestimmten Lagerplatz (bestimmte Anzahl an PositionsIDs)
@@ -110,7 +110,7 @@ int main(void) {
 			artikel_typ_bearbeiten();
 			break;
 		case 3:
-			artikel_loeschen();
+			artikel_typ_loeschen();
 			break;
 		case 4:
 			artikel_erfassen();
@@ -129,21 +129,21 @@ int main(void) {
 // Hier wird das Menü ausgegeben
 int menue() {
 	bs_loeschen();
-	printf("  Halle\t\t\tPorta Westfalica");
-	printf("\n  %d Artikel\t\t%d Artikel", halle_lager.anzahl_artikel, porta_lager.anzahl_artikel);
-	printf("\n  Belegung:\t\tBelegung:");
-	printf("\n  20cm: 40 %%            20cm: 5 %%");
-	printf("\n  40cm: 14 %%            40cm: 51 %%");
-	printf("\n  80cm: 79 %%");
+	printf("Halle\t\t\tPorta Westfalica");
+	printf("\n%d Artikel\t\t%d Artikel", halle_lager.anzahl_artikel, porta_lager.anzahl_artikel);
+	printf("\nBelegung:\t\tBelegung:");
+	printf("\n20cm: %.2lf %%\t\t20cm: %.2lf %%", berechne_belegung_von(0), berechne_belegung_von(1));
+	printf("\n40cm: %.2lf %%\t\t40cm: %.2lf %%", berechne_belegung_von(2), berechne_belegung_von(3));
+	printf("\n80cm: %.2lf %%", berechne_belegung_von(4));
 	printf("\n");
 	printf("\nWarenausgang");
 	printf("\nHalle: 5 Artikel      Porta Westfalica: 6 Artikel");
 	printf("\n");
 	printf("\n(1)   Neuen Artikel anlegen");
 	printf("\n(2)   Artikel bearbeiten");
-	printf("\n(3)   Artikel loeschen");
+	printf("\n(3)   Artikel Typ loeschen");
 	printf("\n(4)   Artikel erfassen");
-	printf("\n(5)   Artikel entfernen");
+	printf("\n(5)   Artikel entfernen"); // Vielleicht muss das auch nicht im Menue angeboten werden 
 	printf("\n(6)   Artikel umraeumen");
 	printf("\n(7)   Alle Artikel ansehen");
 	printf("\n(8)   Lagerbestand zufaellig befuellen");
@@ -158,9 +158,59 @@ int menue() {
 	return 0;
 }
 
+double berechne_belegung_von(int lager) {
+	int i;
+	double anzahl_belegter_ids = 0;
+	double prozent = 0;
+	switch (lager) {
+	case 0: // Prozentberechnung fuer Halle 20cm
+		for (i = 0; i < HALLE_20; i++) {
+			if (belegte_ids_halle_20[i].id != NULL) {
+				anzahl_belegter_ids++;
+			}
+		}
+		prozent = anzahl_belegter_ids * 100 / HALLE_20;
+		break;
+	case 1: // Prozentberechnung fuer Porta WF 20cm
+		for (i = 0; i < PORTA_20; i++) {
+			if (belegte_ids_porta_20[i].id != NULL) {
+				anzahl_belegter_ids++;
+			}
+		}
+		prozent = anzahl_belegter_ids * 100 / PORTA_20;
+		break;
+	case 2: // Prozentberechnung fuer Halle 40cm
+		for (i = 0; i < HALLE_40; i++) {
+			if (belegte_ids_halle_40[i].id != NULL) {
+				anzahl_belegter_ids++;
+			}
+		}
+		prozent = anzahl_belegter_ids * 100 / HALLE_40;
+		break;
+	case 3: // Prozentberechnung fuer Porta WF 40cm
+		for (i = 0; i < PORTA_40; i++) {
+			if (belegte_ids_porta_40[i].id != NULL) {
+				anzahl_belegter_ids++;
+			}
+		}
+		prozent = anzahl_belegter_ids * 100 / PORTA_40;
+		break;
+	case 4: // Prozentberechnung fuer Porta WF 80cm
+		for (i = 0; i < PORTA_80; i++) {
+			if (belegte_ids_porta_80[i].id != NULL) {
+				anzahl_belegter_ids++;
+			}
+		}
+		prozent = anzahl_belegter_ids * 100 / PORTA_80;
+		break;
+	}
+	return prozent;
+}
+
 // Anlegen eines neuen ArtikelTyps
 int neuen_artikel_typ_anlegen() {
 	struct ArtikelTyp artikeltyp;
+	artikeltyp.artikel_davon_im_lager = 0;
 	int lagerwahl = -1;
 	int wahl = 0;
 	int i;
@@ -433,6 +483,8 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			printf("\nBitte geben Sie den neuen Preis ein: ");
 			scanf("%lf", &temp_artikel.preis);
 			break;
+		
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Eingabebeschraenkung hier auch uebernehmen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		case 4:
 			printf("\nBitte geben Sie die neue Hoehe ein: ");
 			scanf("%lf", &temp_artikel.hoehe);
@@ -468,16 +520,16 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 		printf("\nDie Aenderungen wurden erfolgreich gespeichert.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 		while (getchar() != '\n');
 		getchar();
-		*artikel = temp_artikel; // Aktualisierung des Originalartikels mit den Änderungen aus der temporaeren Kopie
+		*artikel = temp_artikel; // Aktualisierung des Originalartikels mit den Aenderungen aus der temporaeren Kopie
 		lager_aktualisieren(artikel); // Funktion zur Aktualisierung der Aenderungen im Lager 
 	}
 
 	return 0;
 }
 
-int artikel_loeschen() {
+int artikel_typ_loeschen() {
 	int artikel_nummer;
-	int i;
+	int i, j, k, l;
 
 	bs_loeschen();
 
@@ -503,15 +555,15 @@ int artikel_loeschen() {
 
 			if (antwort == 'j' || antwort == 'J') {
 				// Artikel löschen aus Lager in Halle
-				for (int j = i; j < halle_lager.anzahl_artikel - 1; j++) {
+				for (j = i; j < halle_lager.anzahl_artikel - 1; j++) {
 					halle_lager.artikel_liste[j] = halle_lager.artikel_liste[j + 1];
 				}
 				halle_lager.anzahl_artikel--;
 
 				// Artikel aus Artikelliste löschen
-				for (int k = 0; k < anzahl_artikel; k++) {
+				for (k = 0; k < anzahl_artikel; k++) {
 					if (artikel_liste[k].art_nummer == artikel_nummer) {
-						for (int l = k; l < anzahl_artikel - 1; l++) {
+						for (l = k; l < anzahl_artikel - 1; l++) {
 							artikel_liste[l] = artikel_liste[l + 1];
 						}
 						anzahl_artikel--;
@@ -733,19 +785,9 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 		// Aktionen für Lager 1 (HALLE)
 		if (lagere_artikel_an_positions_ids_Halle(artikel_pntr) != -1) {
 			print_zugeordnete_ids(artikel_pntr); // Ausgabe der zugeordneten IDs
+			artikel_pntr->typ->artikel_davon_im_lager++;
 			printf("\nArtikel mit der Nummer %d wurde erfolgreich im Halle Lager eingelagert.\n", eingabeNummer);
-
-			// !!!!!!!!!!!!!!!!!! Zeigt Positions IDs der Artikel an, nur zum ueberpruefen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			int l;
-			printf("Artikel: %s\n", artikel.typ->name);
-			printf("AnzahlPositionsIDs: %d\n", artikel.anzahl_positions_ids);
-			printf("PositionsIDs:");
-			for (l = 0; l < 60; l++) {
-				printf("%d, ", artikel.positions[l].id);
-			}
-			while (getchar() != '\n');
-			getchar();
-
+			printf("\nArtikel von Typ %s im Lager: %d\n", artikel_pntr->typ->name, artikel_pntr->typ->artikel_davon_im_lager);
 		}
 		else {
 			printf("Artikel mit der Nummer %d konnte nicht eingelagert werden. Keine passende Position gefunden.\n", eingabeNummer);
@@ -772,7 +814,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 }
 
 // Artikel in Halle einlagern
-int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {		//!! Breite wird abgerundet -> 12cm breiter Artikel belegt nur eine ID !!
+int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 	int i;
 	int start_id;
 	int aktuelle_id;
@@ -790,6 +832,10 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {		//!! Breit
 
 	// Berechnung der Anzahl der vom Artikel belegten IDs basierend auf Breite und Tiefe
 	ids_von_artikel_belegt = (int)(breite / 10); // Breite belegt breite/10 IDs
+	// Aufrunden der Breite
+	if ((breite > 5 && breite < 10) || (breite > 10 && breite < 20) || (breite > 20 && breite < 30) || (breite > 30 && breite < 40) || (breite > 40 && breite < 50) || (breite > 50 && breite < 60)) {
+		ids_von_artikel_belegt += 1;
+	}
 	if (tiefe > 60) {
 		ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
 	}
@@ -1062,6 +1108,10 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 
 	// Berechnung der Anzahl der belegten IDs basierend auf Breite und Tiefe
 	ids_von_artikel_belegt = (int)(breite / 10); // Breite belegt breite/10 IDs
+	// Aufrunden der Breite
+	if ((breite > 5 && breite < 10) || (breite > 10 && breite < 20) || (breite > 20 && breite < 30) || (breite > 30 && breite < 40) || (breite > 40 && breite < 50) || (breite > 50 && breite < 60)) {
+		ids_von_artikel_belegt += 1;
+	}
 	if (tiefe > 60) {
 		ids_von_artikel_belegt *= 2; // Tiefe > 60 belegt das doppelte an IDs
 	}
@@ -1227,7 +1277,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (24000000)
-				int aktuelle_id_index = aktuelle_id - 24000000;
+				int aktuelle_id_index = aktuelle_id - 2400000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
 				// Durchlaufen fuer alle vom Artikel benoetigten Positions IDs
@@ -1260,7 +1310,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
 						double resthoehe;
 						// Hier wird die richtige ID wieder mit der Lagerkennung zusammengebaut
-						aktuelle_id = aktuelle_id_index + 24000000;
+						aktuelle_id = aktuelle_id_index + 2400000;
 
 						// Ueberprueft, ob die aktuelle ID schon als PositionsID erstellt ist
 						// Wenn nicht (== NULL), dann erstelle eine neue PositionsID
@@ -1348,7 +1398,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (28000000)
-				int aktuelle_id_index = aktuelle_id - 28000000;
+				int aktuelle_id_index = aktuelle_id - 2800000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
 				// Durchlaufen fuer alle vom Artikel benötigten Positions IDs
