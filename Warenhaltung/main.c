@@ -155,7 +155,13 @@ int menue() {
 	printf("\nWaehle eine Auswahlmoeglichkeit:");
 	printf("\n");
 
-	return 0;
+	int auswahl;
+	if (scanf("%d", &auswahl) != 1) {
+		printf("Fehler: Ungueltige Eingabe. Bitte geben Sie eine Zahl entsprechend der Auswahlmoeglichkeiten ein!\n");
+		while (getchar() != '\n'); // Leert den Eingabepuffer
+		return -1; // Rueckgabe eines Fehlercodes
+	}
+	return auswahl; // Rueckgabe der gueltigen Auswahl
 }
 
 double berechne_belegung_von(int lager) {
@@ -274,16 +280,16 @@ int neuen_artikel_typ_anlegen() {
 		printf("\nHoehe (in cm; > 5, wenn verderblich <= 40, sonst <= 80): ");
 		scanf("%lf", &artikeltyp.hoehe);
 		if (artikeltyp.hoehe <= 5 || artikeltyp.hoehe > 80)
-			printf("Fehler: Die Hoehe muss groesser 5 cm und kleiner gleich 80 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+			printf("Fehler: Die Hoehe muss groesser als 5 cm und kleiner oder gleich 80 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
 	} while (artikeltyp.hoehe <= 5 || artikeltyp.hoehe > 80);
 
 	// Artikel Breite darf nicht groesser als 300cm sein
 	do {
-		printf("\nBreite (in cm, <= 300): ");
+		printf("\nBreite (in cm; > 5, <= 300): ");
 		scanf("%lf", &artikeltyp.breite);
-		if (artikeltyp.breite > 300)
-			printf("Fehler: Die Breite darf nicht groesser als 300 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
-	} while (artikeltyp.breite > 300);
+		if (artikeltyp.breite <= 5 || artikeltyp.breite > 300)
+			printf("Fehler: Die Breite muss groesser als 5 cm und kleiner oder gleich 300 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
+	} while (artikeltyp.breite <= 5 || artikeltyp.breite > 300);
 
 	// Artikel Tiefe darf nicht groesser als 120cm sein
 	do {
@@ -443,9 +449,6 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 		printf("\n(1) Name");
 		printf("\n(2) Artikelnummer");
 		printf("\n(3) Preis");
-		printf("\n(4) Hoehe");
-		printf("\n(5) Breite");
-		printf("\n(6) Tiefe");
 		printf("\n");
 
 		scanf("%d", &auswahl);
@@ -467,8 +470,13 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			}
 			break;
 		case 2:
-			printf("\nBitte geben Sie die neue Artikelnummer ein: ");
-			scanf("%d", &temp_artikel.art_nummer);
+			printf("\nBitte geben Sie die neue Artikelnummer ein:\n");
+			// Ueberpruefen, ob Ganzzahl eingegeben wird
+			while (scanf("%d", &temp_artikel.art_nummer) != 1) {
+				printf("Fehler: Bitte geben Sie eine Ganzzahl fuer die Artikelnummer ein.\n");
+				while (getchar() != '\n');
+				printf("\nBitte geben Sie die neue Artikelnummer ein: ");
+			}
 			// Ueberpruefen, ob die Artikelnummer bereits existiert
 			for (i = 0; i < anzahl_artikel; i++) {
 				if (temp_artikel.art_nummer == artikel_liste[i].art_nummer && strcmp(temp_artikel.name, artikel_liste[i].name) != 0) {
@@ -483,20 +491,6 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			printf("\nBitte geben Sie den neuen Preis ein: ");
 			scanf("%lf", &temp_artikel.preis);
 			break;
-		
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Eingabebeschraenkung hier auch uebernehmen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		case 4:
-			printf("\nBitte geben Sie die neue Hoehe ein: ");
-			scanf("%lf", &temp_artikel.hoehe);
-			break;
-		case 5:
-			printf("\nBitte geben Sie die neue Breite ein: ");
-			scanf("%lf", &temp_artikel.breite);
-			break;
-		case 6:
-			printf("\nBitte geben Sie die neue Tiefe ein: ");
-			scanf("%lf", &temp_artikel.tiefe);
-			break;
 		default:
 			printf("\nUngueltige Auswahl.");
 			break;
@@ -505,9 +499,6 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 		printf("\nArtikel Name: %s", temp_artikel.name);
 		printf("\nArtikel Nummer: %d", temp_artikel.art_nummer);
 		printf("\nArtikel Preis: %.2lf", temp_artikel.preis);
-		printf("\nArtikel Hoehe (in cm): %.2lf", temp_artikel.hoehe);
-		printf("\nArtikel Breite (in cm): %.2lf", temp_artikel.breite);
-		printf("\nArtikel Tiefe (in cm): %.2lf", temp_artikel.tiefe);
 		printf("\n");
 
 		printf("\nMoechten Sie weitere Details bearbeiten? (1 = Ja, 0 = Nein): ");
