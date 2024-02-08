@@ -30,6 +30,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel);
 int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel);
 int print_zugeordnete_ids(struct Artikel *artikel);
+int artikel_entfernen();
 int vorhandene_artikel_ansehen();
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
@@ -114,6 +115,9 @@ int main(void) {
 			break;
 		case 4:
 			artikel_erfassen();
+			break;
+		case 5:
+			artikel_entfernen();
 			break;
 		case 7:
 			vorhandene_artikel_ansehen();
@@ -535,19 +539,19 @@ int artikel_typ_loeschen() {
 			printf("Breite: %.2f cm\n", halle_lager.artikel_liste[i].breite);
 			printf("Tiefe: %.2f cm\n", halle_lager.artikel_liste[i].tiefe);
 
-			// Bestätigung vom Benutzer einholen
-			char antwort;
-			printf("Moechten Sie diesen Artikel wirklich loeschen? (j/n): ");
-			scanf(" %c", &antwort);
+			// Bestaetigung vom Benutzer einholen
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich loeschen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
 
-			if (antwort == 'j' || antwort == 'J') {
-				// Artikel löschen aus Lager in Halle
+			if (antwort == 1) {
+				// Artikel loeschen aus Lager in Halle
 				for (j = i; j < halle_lager.anzahl_artikel - 1; j++) {
 					halle_lager.artikel_liste[j] = halle_lager.artikel_liste[j + 1];
 				}
 				halle_lager.anzahl_artikel--;
 
-				// Artikel aus Artikelliste löschen
+				// Artikel aus Artikelliste loeschen
 				for (k = 0; k < anzahl_artikel; k++) {
 					if (artikel_liste[k].art_nummer == artikel_nummer) {
 						for (l = k; l < anzahl_artikel - 1; l++) {
@@ -557,6 +561,25 @@ int artikel_typ_loeschen() {
 						break;
 					}
 				}
+				/* Loeschen aus Lager in Halle 20
+				for (j = 0; j < HALLE_20; j++) {
+					if (belegte_ids_halle_20[j].artikelnummer == artikel_nummer) {
+						// Gefundene Positions-ID loeschen
+						belegte_ids_halle_20[j].artikelnummer = 0;
+						belegte_ids_halle_20[j].positions_id_voll = 0;
+						belegte_ids_halle_20[j].resthoehe = 20;
+					}
+				}
+
+				// Loeschen aus Lager in Halle 40
+				for (j = 0; j < HALLE_40; j++) {
+					if (belegte_ids_halle_40[j].artikelnummer == artikel_nummer) {
+						// Gefundene Positions-ID loeschen
+						belegte_ids_halle_40[j].artikelnummer = 0;
+						belegte_ids_halle_40[j].positions_id_voll = 0;
+						belegte_ids_halle_40[j].resthoehe = 40;
+					}
+				}*/
 
 				printf("Artikel erfolgreich geloescht.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 				while (getchar() != '\n');
@@ -584,11 +607,11 @@ int artikel_typ_loeschen() {
 			printf("Tiefe: %.2f cm\n", porta_lager.artikel_liste[i].tiefe);
 
 			// Bestaetigung vom Benutzer einholen
-			char antwort;
-			printf("Moechten Sie diesen Artikel wirklich loeschen? (j/n): ");
-			scanf(" %c", &antwort);
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich loeschen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
 
-			if (antwort == 'j' || antwort == 'J') {
+			if (antwort == 1) {
 				// Artikel loeschen aus Lager PW
 				for (int j = i; j < porta_lager.anzahl_artikel - 1; j++) {
 					porta_lager.artikel_liste[j] = porta_lager.artikel_liste[j + 1];
@@ -679,7 +702,7 @@ int vorhandene_artikel_ansehen() {
 }
 
 // Aktualisierung der Aenderungen am Artikel im Lager
-int lager_aktualisieren(struct ArtikelTyp* artikel) {
+int lager_aktualisieren(struct ArtikelTyp *artikel) {
 	int i;
 	for (i = 0; i < anzahl_artikel; i++) {
 		if (halle_lager.artikel_liste[i].art_nummer == artikel->art_nummer) {
@@ -764,7 +787,7 @@ int generiere_inventarnummer() {
 int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel) {
 	int i;
 
-	struct Artikel* artikel_pntr;
+	struct Artikel *artikel_pntr;
 	artikel_pntr = &artikel;
 
 	// Ueberpruefen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
@@ -1485,6 +1508,28 @@ int print_zugeordnete_ids(struct Artikel *artikel) {
 	for (i = 0; i < artikel->anzahl_positions_ids; i++) {
 		printf("ID %d: %d\n", i + 1, artikel->positions[i].id);
 	}
+}
+
+
+int artikel_entfernen() {
+	int inventarnummer;
+	printf("Geben Sie die Inventarnummer des zu suchenden Artikels ein: ");
+	scanf("%d", &inventarnummer);
+
+	// !!Hier dann Lager durchsuchen; IDs ausgeben, die Artikel belegt; Resthoehe aendern, wenn entfernt wird und id_voll = 0
+
+	// Benutzerbestätigung für das Entfernen des Artikels
+	int antwort;
+	printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
+	scanf(" %d", &antwort);
+
+	if (antwort == 1) {
+		// Entfernen des Artikels aus dem jeweiligen Lager und Aktualisierung Positions-IDs
+	}
+	else {
+		printf("Entfernungsprozess abgebrochen.\n");
+	}
+
 }
 
 // Funktion zum Leeren der Konsolenausgabe
