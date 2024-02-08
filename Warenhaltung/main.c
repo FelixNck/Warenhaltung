@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define HALLE_20 18000//vorhandene Anzahl Positions IDs für 20cm hohe Fächer
+#define HALLE_20 18000	// Vorhandene Anzahl Positions IDs für 20cm hohe Fächer
 #define HALLE_40 54000
 #define PORTA_20 34800
 #define PORTA_40 6000
@@ -35,18 +35,18 @@ int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
 void strtrim(char* str);    // Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
 
-// kennzeichnet eine 10cm Breite und 60cm Tiefe Position im Lager
+// Kennzeichnet eine 10cm Breite und 60cm Tiefe Position im Lager
 struct PositionsID {
 	int id;
-	int resthoehe; // restlicher freier Platz an dieser PositionsID (nicht < 5cm)
+	int resthoehe; // Restlicher freier Platz an dieser PositionsID (nicht < 5cm)
 	int positions_id_voll; // Flag, zum Kennzeichnen, ob PositionsID voll ist
 	int artikelnummer; // Artikelnummer des ArtikelTypen an dieser Position
 };
 
-// viele Artikel gehören einem Typen an
+// Viele Artikel gehören einem Typen an
 struct ArtikelTyp {
 	char name[100];
-	int art_nummer; // eindeutige Kennzeichnung des ArtikelTypen
+	int art_nummer; // Eindeutige Kennzeichnung des ArtikelTypen
 	double preis;
 	double hoehe;
 	double breite;
@@ -55,10 +55,10 @@ struct ArtikelTyp {
 	int artikel_davon_im_lager;
 };
 
-// ein Artikel verbraucht einen bestimmten Lagerplatz (bestimmte Anzahl an PositionsIDs)
+// Ein Artikel verbraucht einen bestimmten Lagerplatz (bestimmte Anzahl an PositionsIDs)
 struct Artikel {
 	struct ArtikelTyp *typ; // Verlinkung zum ArtikelTypen
-	int inventarnummer; // eindeutige Kennzeichnung des gelagertern Artikels
+	int inventarnummer; // Eindeutige Kennzeichnung des gelagertern Artikels
 	struct PositionsID positions[60]; // Verlinkung aller PositionsIDs, die dieser Artikel belegt (60, weil maximal 3 Meter Regale (30 IDs) und doppelseitige Belegung)
 	int anzahl_positions_ids; // Anzahl belegter PositionsIDs
 };
@@ -68,27 +68,27 @@ struct Lager {
 	int anzahl_artikel;
 };
 
-// Liste für bereits angelegte Artikel
+// Liste fuer bereits angelegte Artikel
 struct ArtikelTyp artikel_liste[MAX_ARTIKEL];
 
 struct Lager halle_lager;
 struct Lager porta_lager;
 
-//Enumeration, gibt HALLE Wert 1 und PW Wert 2
+// Enumeration, gibt HALLE Wert 1 und PW Wert 2
 enum LagerTyp {
-	HALLE = 1,  //verderblich
-	PORTA_WESTFALICA = 2    //nicht verderblich
+	HALLE = 1,  // Verderblich
+	PORTA_WESTFALICA = 2    // Nicht verderblich
 };
 
 // Anzahl der bereits vorhandenen Artikel
 int anzahl_artikel = 0;
 
 int inventarnummerZaehler = 1000;
-struct PositionsID belegte_ids_halle_20[HALLE_20]; // Liste für belegte IDs im Halle-Lager mit 20cm Höhe
-struct PositionsID belegte_ids_halle_40[HALLE_40]; // Liste für belegte IDs im Halle-Lager mit 40cm Höhe
-struct PositionsID belegte_ids_porta_20[PORTA_20]; // Liste für belegte IDs im Porta-Lager mit 20cm Höhe
-struct PositionsID belegte_ids_porta_40[PORTA_40]; // Liste für belegte IDs im Porta-Lager mit 40cm Höhe
-struct PositionsID belegte_ids_porta_80[PORTA_80]; // Liste für belegte IDs im Porta-Lager mit 80cm Höhe
+struct PositionsID belegte_ids_halle_20[HALLE_20]; // Liste fuer belegte IDs im Halle-Lager mit 20cm Hoehe
+struct PositionsID belegte_ids_halle_40[HALLE_40]; // Liste fuer belegte IDs im Halle-Lager mit 40cm Hoehe
+struct PositionsID belegte_ids_porta_20[PORTA_20]; // Liste fuer belegte IDs im Porta-Lager mit 20cm Hoehe
+struct PositionsID belegte_ids_porta_40[PORTA_40]; // Liste fuer belegte IDs im Porta-Lager mit 40cm Hoehe
+struct PositionsID belegte_ids_porta_80[PORTA_80]; // Liste fuer belegte IDs im Porta-Lager mit 80cm Hoehe
 
 int main(void) {
 	int auswahl;
@@ -119,14 +119,16 @@ int main(void) {
 			vorhandene_artikel_ansehen();
 			break;
 		default:
-			printf("\nFalsche Eingabe. Waehle eine der oben aufgelisteten Moeglichkeiten!\n");
+			printf("\nFalsche Eingabe. Druecken Sie Enter und waehlen Sie eine der oben aufgelisteten Moeglichkeiten!\n");
+			while (getchar() != '\n');
+			getchar();
 		}
 	}
 
 	return 0;
 }
 
-// Hier wird das Menü ausgegeben
+// Hier wird das Menue ausgegeben
 int menue() {
 	bs_loeschen();
 	printf("Halle\t\t\tPorta Westfalica");
@@ -155,13 +157,7 @@ int menue() {
 	printf("\nWaehle eine Auswahlmoeglichkeit:");
 	printf("\n");
 
-	int auswahl;
-	if (scanf("%d", &auswahl) != 1) {
-		printf("Fehler: Ungueltige Eingabe. Bitte geben Sie eine Zahl entsprechend der Auswahlmoeglichkeiten ein!\n");
-		while (getchar() != '\n'); // Leert den Eingabepuffer
-		return -1; // Rueckgabe eines Fehlercodes
-	}
-	return auswahl; // Rueckgabe der gueltigen Auswahl
+	return 0;
 }
 
 double berechne_belegung_von(int lager) {
@@ -229,13 +225,13 @@ int neuen_artikel_typ_anlegen() {
 	// Artikelname eingeben; Ueberpruefen, ob Name schon existiert
 	printf("\nArtikelname (max. 100 Zeichen): ");
 	// Leert Eingabepuffer nach vorherigen Eingabe
-	while (getchar() != '\n');  // verhindert, dass leere Zeile eingelesen wird
+	while (getchar() != '\n');  // Verhindert, dass leere Zeile eingelesen wird
 	do {
-		fgets(artikeltyp.name, sizeof(artikeltyp.name), stdin); // kann Leerzeichen/ganze Zeile einlesen
+		fgets(artikeltyp.name, sizeof(artikeltyp.name), stdin); // Kann Leerzeichen/ganze Zeile einlesen
 		// Entfernt Zeilenumbruchzeichen am Ende der Eingabe
 		artikeltyp.name[strcspn(artikeltyp.name, "\n")] = '\0';
 
-		strtrim(artikeltyp.name); // löscht Leerzeichen hinter/vor Name
+		strtrim(artikeltyp.name); // Loescht Leerzeichen hinter/vor Name
 		// Ueberpruefen, ob Artikelname bereits existiert
 		int name_existiert = 0;
 		for (i = 0; i < anzahl_artikel; i++) {
@@ -258,7 +254,7 @@ int neuen_artikel_typ_anlegen() {
 			continue; 
 		}
 
-		// Ueberpruefen, ob die Artikelnummer bereits existiert
+		// Ueberpruefen, ob Artikelnummer bereits existiert
 		int nummer_existiert = 0;
 		for (i = 0; i < anzahl_artikel; i++) {
 			if (artikeltyp.art_nummer == artikel_liste[i].art_nummer) {
