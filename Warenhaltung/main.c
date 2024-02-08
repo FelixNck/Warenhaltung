@@ -169,50 +169,65 @@ int neuen_artikel_typ_anlegen() {
 	printf("Neuen Artikel Typ anlegen");
 
 	printf("\n");
+
+	// Artikelname eingeben; Ueberpruefen, ob Name schon existiert
 	printf("\nArtikelname (max. 100 Zeichen): ");
-	// Leere den Eingabepuffer nach der vorherigen Eingabe
+	// Leert Eingabepuffer nach vorherigen Eingabe
 	while (getchar() != '\n');  // verhindert, dass leere Zeile eingelesen wird
-	fgets(artikeltyp.name, sizeof(artikeltyp.name), stdin); // kann Leerzeichen/ganze Zeile einlesen
-	// Entferne das Zeilenumbruchzeichen am Ende der Eingabe
-	artikeltyp.name[strcspn(artikeltyp.name, "\n")] = '\0';
+	do {
+		fgets(artikeltyp.name, sizeof(artikeltyp.name), stdin); // kann Leerzeichen/ganze Zeile einlesen
+		// Entfernt Zeilenumbruchzeichen am Ende der Eingabe
+		artikeltyp.name[strcspn(artikeltyp.name, "\n")] = '\0';
 
-	strtrim(artikeltyp.name); //löscht Leerzeichen hinter/vor Name
-	// Überprüfen, ob der Artikelname bereits existiert
-	for (i = 0; i < anzahl_artikel; i++) {
-		if (strcmp(artikeltyp.name, artikel_liste[i].name) == 0) {
-			printf("\nFehler: Ein Artikel mit diesem Namen existiert bereits. Druecke Enter, um zurueck in das Menue zu kommen.\n");
-			while (getchar() != '\n');
-			getchar();
-			return 0; // Rückkehr, da Fehler aufgetreten ist
+		strtrim(artikeltyp.name); // löscht Leerzeichen hinter/vor Name
+		// Ueberpruefen, ob Artikelname bereits existiert
+		int name_existiert = 0;
+		for (i = 0; i < anzahl_artikel; i++) {
+			if (strcmp(artikeltyp.name, artikel_liste[i].name) == 0) {
+				printf("\nFehler: Ein Artikel mit diesem Namen existiert bereits.\nBitte geben Sie einen neuen Namen ein:\n");
+				name_existiert = 1;
+				break;
+			}
 		}
-	}
+		if (!name_existiert) // Wenn Name eindeutig ist, bricht Schleife ab
+			break;
+	} while (1);
 
-	printf("\nArtikel Nummer: ");
-	scanf("%d", &artikeltyp.art_nummer);
-
-	// Überprüfen, ob die Artikelnummer bereits existiert
-	for (i = 0; i < anzahl_artikel; i++) {
-		if (artikeltyp.art_nummer == artikel_liste[i].art_nummer) {
-			printf("\nFehler: Artikel mit dieser Nummer existiert bereits. Druecke Enter, um zurueck in das Menue zu kommen.\n");
-			while (getchar() != '\n');
-			getchar();
-			return 0; // Rückkehr, da Fehler aufgetreten ist
+	// Eingabe Artikelnummer; Ueberpruefen, ob schon existent und ob Ganzzahl
+	while (1) {
+		printf("\nArtikel Nummer (Ganzzahl): ");
+		if (scanf("%d", &artikeltyp.art_nummer) != 1 || getchar() != '\n') {
+			printf("Fehler: Bitte geben Sie eine gueltige Ganzzahl fuer die Artikelnummer ein.\n");
+			while (getchar() != '\n'); 
+			continue; 
 		}
-	}
 
+		// Ueberpruefen, ob die Artikelnummer bereits existiert
+		int nummer_existiert = 0;
+		for (i = 0; i < anzahl_artikel; i++) {
+			if (artikeltyp.art_nummer == artikel_liste[i].art_nummer) {
+				printf("\nFehler: Artikel mit dieser Nummer existiert bereits. Bitte geben Sie eine andere Nummer ein.\n");
+				nummer_existiert = 1;
+				break; // Bricht Schleife ab, da Nummer schon existent
+			}
+		}
+
+		if (!nummer_existiert) // Wenn eingegebene Nummer eindeutig ist
+			break;
+	}
 
 	printf("\nPreis (in EUR): ");
 	scanf("%lf", &artikeltyp.preis);
 
-	// Artikel Höhe darf nicht größer als 80 cm sein
+	// Artikel Hoehe muss > 5 und <= 80 cm sein
 	do {
-		printf("\nHoehe (in cm; wenn verderblich <= 40, sonst <= 80): ");
+		printf("\nHoehe (in cm; > 5, wenn verderblich <= 40, sonst <= 80): ");
 		scanf("%lf", &artikeltyp.hoehe);
-		if (artikeltyp.hoehe > 80)
-			printf("Fehler: Falsche Hoehe! Geben Sie bitte eine gueltige Hoehe ein!\n");
-	} while (artikeltyp.hoehe > 80);
+		if (artikeltyp.hoehe <= 5 || artikeltyp.hoehe > 80)
+			printf("Fehler: Die Hoehe muss groesser 5 cm und kleiner gleich 80 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+	} while (artikeltyp.hoehe <= 5 || artikeltyp.hoehe > 80);
 
-	// Artikel Breite darf nicht größer als 300cm sein
+	// Artikel Breite darf nicht groesser als 300cm sein
 	do {
 		printf("\nBreite (in cm, <= 300): ");
 		scanf("%lf", &artikeltyp.breite);
@@ -220,7 +235,7 @@ int neuen_artikel_typ_anlegen() {
 			printf("Fehler: Die Breite darf nicht groesser als 300 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
 	} while (artikeltyp.breite > 300);
 
-	// Artikel Tiefe darf nicht größer als 120cm sein
+	// Artikel Tiefe darf nicht groesser als 120cm sein
 	do {
 		printf("\nTiefe (in cm, <= 120): ");
 		scanf("%lf", &artikeltyp.tiefe);
@@ -276,7 +291,7 @@ int neuen_artikel_typ_anlegen() {
 	printf("\nArtikel Breite (in cm): %.2lf", artikeltyp.breite);
 	printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp.tiefe);
 
-	// Hinzufügen des neuen Artikels zur Liste
+	// Hinzufuegen des neuen Artikels zur Liste
 	artikel_liste[anzahl_artikel] = artikeltyp;
 	anzahl_artikel++;
 
@@ -285,7 +300,6 @@ int neuen_artikel_typ_anlegen() {
 
 	return 0;
 }
-
 
 
 int artikel_typ_bearbeiten() {
@@ -317,7 +331,7 @@ int artikel_typ_bearbeiten() {
 				printf("\nArtikel Tiefe (in cm): %.2lf", artikel_liste[i].tiefe);
 				printf("\n");
 
-				// Code für Änderung Details des Artikels
+				// Code für Aenderung Details des Artikels
 				details_waehlen_bearbeitung(&artikel_liste[i]);
 				gefunden = 1;
 				break;
@@ -348,7 +362,7 @@ int artikel_typ_bearbeiten() {
 				printf("\nArtikel Tiefe (in cm): %.2lf", artikel_liste[i].tiefe);
 				printf("\n");
 
-				// Code für die Änderung Details Artikel
+				// Code für die Aenderung Details Artikel
 				details_waehlen_bearbeitung(&artikel_liste[i]);
 				gefunden = 1;
 				break;
@@ -371,7 +385,7 @@ int artikel_typ_bearbeiten() {
 int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 	int weitere_aenderungen = 1;
 	int auswahl;
-	struct ArtikelTyp temp_artikel = *artikel; // Temporäre Kopie des Artikels
+	struct ArtikelTyp temp_artikel = *artikel; // Temporaere Kopie des Artikels
 	int i;
 
 	do {
@@ -392,7 +406,7 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			fgets(temp_artikel.name, sizeof(temp_artikel.name), stdin); // Einlesen des Namens mit Leerzeichen
 			temp_artikel.name[strcspn(temp_artikel.name, "\n")] = 0; // Entfernen des Zeilenumbruchs
 			strtrim(temp_artikel.name);
-			// Überprüfung, ob der Name bereits existiert
+			// Ueberpruefen, ob der Name bereits existiert
 			for (i = 0; i < anzahl_artikel; i++) {
 				if (strcmp(temp_artikel.name, artikel_liste[i].name) == 0 && temp_artikel.art_nummer != artikel_liste[i].art_nummer) {
 					printf("\nFehler: Der eingegebene Name existiert bereits in einem anderen Artikel.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
@@ -405,7 +419,7 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 		case 2:
 			printf("\nBitte geben Sie die neue Artikelnummer ein: ");
 			scanf("%d", &temp_artikel.art_nummer);
-			// Überprüfung, ob die Artikelnummer bereits existiert
+			// Ueberpruefen, ob die Artikelnummer bereits existiert
 			for (i = 0; i < anzahl_artikel; i++) {
 				if (temp_artikel.art_nummer == artikel_liste[i].art_nummer && strcmp(temp_artikel.name, artikel_liste[i].name) != 0) {
 					printf("\nFehler: Die eingegebene Artikelnummer existiert bereits.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
@@ -454,8 +468,8 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 		printf("\nDie Aenderungen wurden erfolgreich gespeichert.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 		while (getchar() != '\n');
 		getchar();
-		*artikel = temp_artikel; // Aktualisierung des Originalartikels mit den Änderungen aus der temporären Kopie
-		lager_aktualisieren(artikel); // Funktion zur Aktualisierung der Änderungen im Lager 
+		*artikel = temp_artikel; // Aktualisierung des Originalartikels mit den Änderungen aus der temporaeren Kopie
+		lager_aktualisieren(artikel); // Funktion zur Aktualisierung der Aenderungen im Lager 
 	}
 
 	return 0;
@@ -470,7 +484,7 @@ int artikel_loeschen() {
 	printf("Geben Sie die Artikelnummer des zu loeschenden Artikels ein: ");
 	scanf("%d", &artikel_nummer);
 
-	// Sucht nach dem Artikel in den Lagerlisten und löscht ihn, wenn j
+	// Sucht nach dem Artikel in den Lagerlisten und loescht ihn, wenn j
 	for (i = 0; i < halle_lager.anzahl_artikel; i++) {
 		if (halle_lager.artikel_liste[i].art_nummer == artikel_nummer) {
 			// Artikel gefunden, zeigt die Details an
@@ -530,19 +544,19 @@ int artikel_loeschen() {
 			printf("Breite: %.2f cm\n", porta_lager.artikel_liste[i].breite);
 			printf("Tiefe: %.2f cm\n", porta_lager.artikel_liste[i].tiefe);
 
-			// Bestätigung vom Benutzer einholen
+			// Bestaetigung vom Benutzer einholen
 			char antwort;
 			printf("Moechten Sie diesen Artikel wirklich loeschen? (j/n): ");
 			scanf(" %c", &antwort);
 
 			if (antwort == 'j' || antwort == 'J') {
-				// Artikel löschen aus Lager PW
+				// Artikel loeschen aus Lager PW
 				for (int j = i; j < porta_lager.anzahl_artikel - 1; j++) {
 					porta_lager.artikel_liste[j] = porta_lager.artikel_liste[j + 1];
 				}
 				porta_lager.anzahl_artikel--;
 
-				// Artikel aus Artikelliste (wo alle Artikel drin stehen) löschen
+				// Artikel aus Artikelliste (wo alle Artikel drin stehen) loeschen
 				for (int k = 0; k < anzahl_artikel; k++) {
 					if (artikel_liste[k].art_nummer == artikel_nummer) {
 						for (int l = k; l < anzahl_artikel - 1; l++) {
@@ -625,7 +639,7 @@ int vorhandene_artikel_ansehen() {
 	getchar();
 }
 
-// Aktualisierung der Änderungen am Artikel im Lager
+// Aktualisierung der Aenderungen am Artikel im Lager
 int lager_aktualisieren(struct ArtikelTyp* artikel) {
 	int i;
 	for (i = 0; i < anzahl_artikel; i++) {
@@ -643,7 +657,7 @@ int lager_aktualisieren(struct ArtikelTyp* artikel) {
 	}
 }
 
-// Funktion zum Suchen, Anzeigen und einlagern (dazu ists noch nicht gekommen) des Artikels
+// Funktion zum Suchen, Anzeigen und einlagern des Artikels
 int artikel_erfassen() {
 	int gefunden = 0;
 	int eingabeNummer;
@@ -653,7 +667,7 @@ int artikel_erfassen() {
 
 
 	do {
-		gefunden = 0; // Zurücksetzen des gefunden-Flags
+		gefunden = 0; // Zuruecksetzen des gefunden-Flags
 
 		bs_loeschen();
 
@@ -703,7 +717,7 @@ int artikel_erfassen() {
 }
 
 int generiere_inventarnummer() {
-	// Inkrementiere den Zähler und gib die neue Inventarnummer zurück
+	// Inkrementiere Zaehler und gib neue Inventarnummer zurück
 	return ++inventarnummerZaehler;
 }
 
@@ -714,14 +728,14 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 	struct Artikel* artikel_pntr;
 	artikel_pntr = &artikel;
 
-	// Überprüfen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
+	// Ueberpruefen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
 	if (lager == 1) {
 		// Aktionen für Lager 1 (HALLE)
 		if (lagere_artikel_an_positions_ids_Halle(artikel_pntr) != -1) {
 			print_zugeordnete_ids(artikel_pntr); // Ausgabe der zugeordneten IDs
 			printf("\nArtikel mit der Nummer %d wurde erfolgreich im Halle Lager eingelagert.\n", eingabeNummer);
 
-			// !!!!!!!!!!!!!!!!!! Zeigt Positions IDs der Artikel an, nur zum überprüfen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!!!!!!!!!!!!!! Zeigt Positions IDs der Artikel an, nur zum ueberpruefen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			int l;
 			printf("Artikel: %s\n", artikel.typ->name);
 			printf("AnzahlPositionsIDs: %d\n", artikel.anzahl_positions_ids);
@@ -758,7 +772,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 }
 
 // Artikel in Halle einlagern
-int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
+int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {		//!! Breite wird abgerundet -> 12cm breiter Artikel belegt nur eine ID !!
 	int i;
 	int start_id;
 	int aktuelle_id;
@@ -771,7 +785,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 	double tiefe = artikel->typ->tiefe;
 	int artikelnummer = artikel->typ->art_nummer;
 
-	int lager_halle_20_cm_voll = 0; // Flag, ob Lagerplatz mit 20cm hohen Fächern voll ist
+	int lager_halle_20_cm_voll = 0; // Flag, ob Lagerplatz mit 20cm hohen Faechern voll ist
 	int ids_von_artikel_belegt = 0; // Anzahl der vom Artikel belegten IDs
 
 	// Berechnung der Anzahl der vom Artikel belegten IDs basierend auf Breite und Tiefe
@@ -785,11 +799,11 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 	if (hoehe <= 20) {
 		start_id = START_ID_HALLE_20CM;
 
-		// Durchlaufen aller möglichen IDs für Halle 20cm Lagerplatz 
+		// Durchlaufen aller moeglichen IDs für Halle 20cm Lagerplatz 
 		for (aktuelle_id = start_id; aktuelle_id < max_anzahl_halle_20; aktuelle_id++) {
 			int available = 0;
 			i = aktuelle_id - START_ID_HALLE_20CM;
-			// Überprüfen, ob aktuelle ID schon in der Liste belegte_ids_halle_20 vorhanden ist
+			// Ueberpruefen, ob aktuelle ID schon in der Liste belegte_ids_halle_20 vorhanden ist
 			// Wenn an der Stelle i in belegte_ids_halle_20 noch kein Element vorhanden ist, wir die ID als verfügbar angesehen
 			if (belegte_ids_halle_20[i].id == NULL) {
 				available = 1;
@@ -800,13 +814,13 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 					// Vergleich, ob die Artikelnummer der PositionsID an der Stelle i in belegte_ids_halle_20 gleich der Artikel Nummer von dem ArtikelTyp des Artikels ist
 					// Wenn nicht, fange mit der nächsten ID neu an
 					if (belegte_ids_halle_20[i].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüft, ob PositionsID den Flag "voll" gesetzt hat
+						// Ueberpruefen, ob PositionsID den Flag "voll" gesetzt hat
 						// Wenn ja, fange mit der nächsten ID neu an
 						if (belegte_ids_halle_20[i].positions_id_voll == 1) {
 							continue;
 						}
-						// Überprüft, ob der Artikel von der Höhe noch in die PositionsID passt
-						// Wenn ja, dann ist diese ID Potentiell möglich
+						// Ueberpruefen, ob der Artikel von der Hoehe noch in die PositionsID passt
+						// Wenn ja, dann ist diese ID Potentiell moeglich
 						else if (belegte_ids_halle_20[i].resthoehe >= hoehe) {
 							available = 1;
 						}
@@ -816,38 +830,38 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 					}
 				}
 			}
-			// aktuelle ID ist potentiell möglich
-			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
+			// aktuelle ID ist potentiell moeglich
+			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (12000000)
 				int aktuelle_id_index = aktuelle_id - 12000000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
-				// Durchlaufen für alle vom Artikel benötigten Positions IDs
+				// Durchlaufen für alle vom Artikel benoetigten Positions IDs
 				for (id_index_zaheler = aktuelle_id_index; id_index_zaheler <= letzte_belegte_id; id_index_zaheler++) {
-					// Steht an der Stelle im Array überhaupt schon was?
+					// Steht an der Stelle im Array ueberhaupt schon was?
 					if (belegte_ids_halle_20[id_index_zaheler].id == NULL) {
 						continue;
 					}
-					// Überprüfen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
+					// Ueberpruefen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
 					else if (belegte_ids_halle_20[id_index_zaheler].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüfen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfügbar, es muss also eine andere ID gesucht werden
+						// Ueberpruefen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfuegbar, es muss also eine andere ID gesucht werden
 						if (belegte_ids_halle_20[id_index_zaheler].positions_id_voll == 1) {
 							available = 0;
 						}
-						// Überprüfen, ob der einzulagernde Artikel in die Resthöhe des Fachs passt, wenn ja, dann durchlaufe alles auch für die nächsten benötigten IDs
+						// Ueberpruefen, ob der einzulagernde Artikel in die Resthoehe des Fachs passt, wenn ja, dann durchlaufe alles auch fuer die nächsten benoetigten IDs
 						else if (belegte_ids_halle_20[id_index_zaheler].resthoehe >= artikel->typ->hoehe) {
 							continue;
 						}
 					}
-					// ID nicht verfügbar, suche andere ID
+					// ID nicht verfuegbar, suche andere ID
 					else {
 						available = 0;
 						break;
 					}
 				}
 
-				// Aktuelle ID (und nachfolgende) sind möglich, artikel kann an die Stelle eingelagert werden
+				// Aktuelle ID (und nachfolgende) sind moeglich, Artikel kann an die Stelle eingelagert werden
 				if (available == 1) {
 					// Für jede vom Artikel belegte ID einen struct anlegen
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
@@ -855,7 +869,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						// Hier wird die richtige ID wieder mit der Lagerkennung zusammengebaut
 						aktuelle_id = aktuelle_id_index + 12000000;
 
-						// Überprüft, ob die aktuelle ID schon als PositionsID erstellt ist
+						// Ueberpruefen, ob die aktuelle ID schon als PositionsID erstellt ist
 						// Wenn nicht (== NULL), dann erstelle eine neue PositionsID
 						if (belegte_ids_halle_20[aktuelle_id_index].id == NULL) {
 							struct PositionsID positions_id;
@@ -863,18 +877,18 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 							positions_id.artikelnummer = artikel->typ->art_nummer;
 							positions_id.positions_id_voll = 0;
 
-							// Berechnung der Resthöhe
+							// Berechnung der Resthoehe
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_halle_20[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -882,7 +896,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_halle_20[aktuelle_id_index];
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -891,7 +905,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_halle_20[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -906,12 +920,12 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 	else if (((hoehe > 20) && (hoehe <= 40)) || lager_halle_20_cm_voll == 1) {
 		start_id = START_ID_HALLE_40CM;
 
-		// Durchlaufen aller möglichen IDs für Halle 40cm Lagerplatz 
+		// Durchlaufen aller moeglichen IDs fuer Halle 40cm Lagerplatz 
 		for (aktuelle_id = start_id; aktuelle_id < max_anzahl_halle_40; aktuelle_id++) {
 			int available = 0;
 			int i = aktuelle_id - START_ID_HALLE_40CM;
-			// Überprüfen, ob aktuelle ID schon in der Liste belegte_ids_halle_40 vorhanden ist
-			// Wenn an der Stelle i in belegte_ids_halle_40 noch kein Element vorhanden ist, wir die ID als verfügbar angesehen
+			// Ueberpruefen, ob aktuelle ID schon in der Liste belegte_ids_halle_40 vorhanden ist
+			// Wenn an der Stelle i in belegte_ids_halle_40 noch kein Element vorhanden ist, wir die ID als verfuegbar angesehen
 			if (belegte_ids_halle_40[i].id == NULL) {
 				available = 1;
 			}
@@ -919,15 +933,15 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 				// Vergleich, ob die aktuelle_id in belegte_ids_halle_40 vorhanden ist
 				if (belegte_ids_halle_40[i].id == aktuelle_id) {
 					// Vergleich, ob die Artikelnummer der PositionsID an der Stelle i in belegte_ids_halle_40 gleich der Artikel Nummer von dem ArtikelTyp des Artikels ist
-					// Wenn nicht, fange mit der nächsten ID neu an
+					// Wenn nicht, fange mit der naechsten ID neu an
 					if (belegte_ids_halle_40[i].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüft, ob PositionsID den Flag "voll" gesetzt hat
-						// Wenn ja, fange mit der nächsten ID neu an
+						// Ueberpruefen, ob PositionsID den Flag "voll" gesetzt hat
+						// Wenn ja, fange mit der naechsten ID neu an
 						if (belegte_ids_halle_40[i].positions_id_voll == 1) {
 							continue;
 						}
-						// Überprüft, ob der Artikel von der Höhe noch in die PositionsID passt
-						// Wenn ja, dann ist diese ID Potentiell möglich
+						// Ueberpruefen, ob der Artikel von der Hoehe noch in die PositionsID passt
+						// Wenn ja, dann ist diese ID Potentiell moeglich
 						else if (belegte_ids_halle_40[i].resthoehe >= hoehe) {
 							available = 1;
 						}
@@ -937,38 +951,38 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 					}
 				}
 			}
-			// aktuelle ID ist potentiell möglich
-			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
+			// aktuelle ID ist potentiell moeglich
+			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (14000000)
 				int aktuelle_id_index = aktuelle_id - 14000000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
-				// Durchlaufen für alle vom Artikel benötigten Positions IDs
+				// Durchlaufen fuer alle vom Artikel benoetigten Positions IDs
 				for (id_index_zaheler = aktuelle_id_index; id_index_zaheler <= letzte_belegte_id; id_index_zaheler++) {
-					// Steht an der Stelle im Array überhaupt schon was?
+					// Steht an der Stelle im Array ueberhaupt schon was?
 					if (belegte_ids_halle_40[id_index_zaheler].id == NULL) {
 						continue;
 					}
-					// Überprüfen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
+					// Ueberpruefen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
 					else if (belegte_ids_halle_40[id_index_zaheler].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüfen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfügbar, es muss also eine andere ID gesucht werden
+						// Ueberpruefen, ob das Fach als "voll" markiert ist, wenn nicht, dann ist diese ID nicht verfuegbar, es muss also eine andere ID gesucht werden
 						if (belegte_ids_halle_40[id_index_zaheler].positions_id_voll == 1) {
 							available = 0;
 						}
-						// Überprüfen, ob der einzulagernde Artikel in die Resthöhe des Fachs passt, wenn ja, dann durchlaufe alles auch für die nächsten benötigten IDs
+						// Ueberpruefen, ob der einzulagernde Artikel in die Resthoehe des Fachs passt, wenn ja, dann durchlaufe alles auch fuer die nächsten benoetigten IDs
 						else if (belegte_ids_halle_40[id_index_zaheler].resthoehe >= artikel->typ->hoehe) {
 							continue;
 						}
 					}
-					// ID nicht verfügbar, suche andere ID
+					// ID nicht verfuegbar, suche andere ID
 					else {
 						available = 0;
 						break;
 					}
 				}
 
-				// Aktuelle ID (und nachfolgende) sind möglich, artikel kann an die Stelle eingelagert werden
+				// Aktuelle ID (und nachfolgende) sind moeglich, artikel kann an die Stelle eingelagert werden
 				if (available == 1) {
 					// Für jede vom Artikel belegte ID einen struct anlegen
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
@@ -976,7 +990,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						// Hier wird die richtige ID wieder mit der Lagerkennung zusammengebaut
 						aktuelle_id = aktuelle_id_index + 14000000;
 
-						// Überprüft, ob die aktuelle ID schon als PositionsID erstellt ist
+						// Ueberpruefen, ob aktuelle ID schon als PositionsID erstellt ist
 						// Wenn nicht (== NULL), dann erstelle eine neue PositionsID
 						if (belegte_ids_halle_40[aktuelle_id_index].id == NULL) {
 							struct PositionsID positions_id;
@@ -984,18 +998,18 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 							positions_id.artikelnummer = artikel->typ->art_nummer;
 							positions_id.positions_id_voll = 0;
 
-							// Berechnung der Resthöhe
+							// Berechnung der Resthoehe
 							double resthoehe = 40 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_halle_40[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1003,13 +1017,13 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_halle_40[aktuelle_id_index];
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
 							positions_id.resthoehe = resthoehe;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_halle_40[aktuelle_id_index] = positions_id;
@@ -1022,7 +1036,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 			}
 		}
 	}
-	// Rückgabe eines ungültigen Wertes, falls keine passende Position gefunden wurde
+	// Rueckgabe eines ungueltigen Wertes, falls keine passende Position gefunden wurde
 	return -1;
 }
 
@@ -1041,8 +1055,8 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 	double tiefe = artikel->typ->tiefe;
 	int artikelnummer = artikel->typ->art_nummer;
 
-	int lager_porta_20_cm_voll = 0; // Flag, ob Lagerplatz mit 20cm hohen Fächern voll ist
-	int lager_porta_40_cm_voll = 0; // Flag, ob Lagerplatz mit 40cm hohen Fächern voll ist
+	int lager_porta_20_cm_voll = 0; // Flag, ob Lagerplatz mit 20cm hohen Faechern voll ist
+	int lager_porta_40_cm_voll = 0; // Flag, ob Lagerplatz mit 40cm hohen Faechern voll ist
 
 	int ids_von_artikel_belegt = 0; // Anzahl der belegten IDs
 
@@ -1057,12 +1071,12 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 	if (hoehe <= 20) {
 		start_id = START_ID_PORTA_20CM;
 
-		// Durchlaufen aller möglichen IDs für Porta 20cm Lagerplatz 
+		// Durchlaufen aller moeglichen IDs für Porta 20cm Lagerplatz 
 		for (aktuelle_id = start_id; aktuelle_id < max_anzahl_porta_20; aktuelle_id++) {
 			int available = 0;
 			i = aktuelle_id - START_ID_PORTA_20CM;
-			// Überprüfen, ob aktuelle ID schon in der Liste belegte_ids_porta_20 vorhanden ist
-			// Wenn an der Stelle i in belegte_ids_porta_20 noch kein Element vorhanden ist, wir die ID als verfügbar angesehen
+			// Ueberpruefen, ob aktuelle ID schon in der Liste belegte_ids_porta_20 vorhanden ist
+			// Wenn an der Stelle i in belegte_ids_porta_20 noch kein Element vorhanden ist, wir die ID als verfuegbar angesehen
 			if (belegte_ids_porta_20[i].id == NULL) {
 				available = 1;
 			}
@@ -1070,15 +1084,15 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 				// Vergleich, ob die aktuelle_id in belegte_ids_porta_20 vorhanden ist
 				if (belegte_ids_porta_20[i].id == aktuelle_id) {
 					// Vergleich, ob die Artikelnummer der PositionsID an der Stelle i in belegte_ids_porta_20 gleich der Artikel Nummer von dem ArtikelTyp des Artikels ist
-					// Wenn nicht, fange mit der nächsten ID neu an
+					// Wenn nicht, fange mit der naechsten ID neu an
 					if (belegte_ids_porta_20[i].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüft, ob PositionsID den Flag "voll" gesetzt hat
-						// Wenn ja, fange mit der nächsten ID neu an
+						// Ueberpruefen, ob PositionsID den Flag "voll" gesetzt hat
+						// Wenn ja, fange mit der naechsten ID neu an
 						if (belegte_ids_porta_20[i].positions_id_voll == 1) {
 							continue;
 						}
-						// Überprüft, ob der Artikel von der Höhe noch in die PositionsID passt
-						// Wenn ja, dann ist diese ID Potentiell möglich
+						// Ueberpruefen, ob der Artikel von der Hoehe noch in die PositionsID passt
+						// Wenn ja, dann ist diese ID Potentiell moeglich
 						else if (belegte_ids_porta_20[i].resthoehe >= hoehe) {
 							available = 1;
 						}
@@ -1088,46 +1102,46 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 					}
 				}
 			}
-			// aktuelle ID ist potentiell möglich
-			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
+			// aktuelle ID ist potentiell moeglich
+			// UEberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (12000000)
 				int aktuelle_id_index = aktuelle_id - 22000000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
-				// Durchlaufen für alle vom Artikel benötigten Positions IDs
+				// Durchlaufen fuer alle vom Artikel benoetigten Positions IDs
 				for (id_index_zaheler = aktuelle_id_index; id_index_zaheler <= letzte_belegte_id; id_index_zaheler++) {
-					// Steht an der Stelle im Array überhaupt schon was?
+					// Steht an der Stelle im Array ueberhaupt schon was?
 					if (belegte_ids_porta_20[id_index_zaheler].id == NULL) {
 						continue;
 					}
-					// Überprüfen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
+					// Ueberpruefen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
 					else if (belegte_ids_porta_20[id_index_zaheler].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüfen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfügbar, es muss also eine andere ID gesucht werden
+						// Ueberpruefen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfuegbar, es muss also eine andere ID gesucht werden
 						if (belegte_ids_porta_20[id_index_zaheler].positions_id_voll == 1) {
 							available = 0;
 						}
-						// Überprüfen, ob der einzulagernde Artikel in die Resthöhe des Fachs passt, wenn ja, dann durchlaufe alles auch für die nächsten benötigten IDs
+						// Ueberpruefen, ob der einzulagernde Artikel in die Resthoehe des Fachs passt, wenn ja, dann durchlaufe alles auch fuer die naechsten benoetigten IDs
 						else if (belegte_ids_porta_20[id_index_zaheler].resthoehe >= artikel->typ->hoehe) {
 							continue;
 						}
 					}
-					// ID nicht verfügbar, suche andere ID
+					// ID nicht verfuegbar, suche andere ID
 					else {
 						available = 0;
 						break;
 					}
 				}
 
-				// Aktuelle ID (und nachfolgende) sind möglich, artikel kann an die Stelle eingelagert werden
+				// Aktuelle ID (und nachfolgende) sind moeglich, Artikel kann an die Stelle eingelagert werden
 				if (available == 1) {
-					// Für jede vom Artikel belegte ID einen struct anlegen
+					// Fuer jede vom Artikel belegte ID einen struct anlegen
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
 						double resthoehe;
 						// Hier wird die richtige ID wieder mit der Lagerkennung zusammengebaut
 						aktuelle_id = aktuelle_id_index + 22000000;
 
-						// Überprüft, ob die aktuelle ID schon als PositionsID erstellt ist
+						// Ueberpruefen, ob die aktuelle ID schon als PositionsID erstellt ist
 						// Wenn nicht (== NULL), dann erstelle eine neue PositionsID
 						if (belegte_ids_porta_20[aktuelle_id_index].id == NULL) {
 							struct PositionsID positions_id;
@@ -1135,18 +1149,18 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 							positions_id.artikelnummer = artikel->typ->art_nummer;
 							positions_id.positions_id_voll = 0;
 
-							// Berechnung der Resthöhe
+							// Berechnung der Resthoehe
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_porta_20[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1154,7 +1168,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_porta_20[aktuelle_id_index];
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1163,7 +1177,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_porta_20[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1178,12 +1192,12 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 	else if (((hoehe > 20) && (hoehe <= 40)) || lager_porta_20_cm_voll == 1) {
 		start_id = START_ID_PORTA_40CM;
 
-		// Durchlaufen aller möglichen IDs für Porta 40cm Lagerplatz 
+		// Durchlaufen aller moeglichen IDs für Porta 40cm Lagerplatz 
 		for (aktuelle_id = start_id; aktuelle_id < max_anzahl_porta_40; aktuelle_id++) {
 			int available = 0;
 			i = aktuelle_id - START_ID_PORTA_40CM;
-			// Überprüfen, ob aktuelle ID schon in der Liste belegte_ids_porta_40 vorhanden ist
-			// Wenn an der Stelle i in belegte_ids_porta_40 noch kein Element vorhanden ist, wir die ID als verfügbar angesehen
+			// Ueberpruefen, ob aktuelle ID schon in der Liste belegte_ids_porta_40 vorhanden ist
+			// Wenn an der Stelle i in belegte_ids_porta_40 noch kein Element vorhanden ist, wir die ID als verfuegbar angesehen
 			if (belegte_ids_porta_40[i].id == NULL) {
 				available = 1;
 			}
@@ -1191,15 +1205,15 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 				// Vergleich, ob die aktuelle_id in belegte_ids_porta_40 vorhanden ist
 				if (belegte_ids_porta_40[i].id == aktuelle_id) {
 					// Vergleich, ob die Artikelnummer der PositionsID an der Stelle i in belegte_ids_porta_40 gleich der Artikel Nummer von dem ArtikelTyp des Artikels ist
-					// Wenn nicht, fange mit der nächsten ID neu an
+					// Wenn nicht, fange mit der naechsten ID neu an
 					if (belegte_ids_porta_40[i].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüft, ob PositionsID den Flag "voll" gesetzt hat
-						// Wenn ja, fange mit der nächsten ID neu an
+						// Ueberprueft, ob PositionsID den Flag "voll" gesetzt hat
+						// Wenn ja, fange mit der naechsten ID neu an
 						if (belegte_ids_porta_40[i].positions_id_voll == 1) {
 							continue;
 						}
-						// Überprüft, ob der Artikel von der Höhe noch in die PositionsID passt
-						// Wenn ja, dann ist diese ID Potentiell möglich
+						// Ueberprueft, ob der Artikel von der Hoehe noch in die PositionsID passt
+						// Wenn ja, dann ist diese ID Potentiell moeglich
 						else if (belegte_ids_porta_40[i].resthoehe >= hoehe) {
 							available = 1;
 						}
@@ -1209,46 +1223,46 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 					}
 				}
 			}
-			// aktuelle ID ist potentiell möglich
-			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
+			// Aktuelle ID ist potentiell moeglich
+			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (24000000)
 				int aktuelle_id_index = aktuelle_id - 24000000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
-				// Durchlaufen für alle vom Artikel benötigten Positions IDs
+				// Durchlaufen fuer alle vom Artikel benoetigten Positions IDs
 				for (id_index_zaheler = aktuelle_id_index; id_index_zaheler <= letzte_belegte_id; id_index_zaheler++) {
-					// Steht an der Stelle im Array überhaupt schon was?
+					// Steht an der Stelle im Array ueberhaupt schon was?
 					if (belegte_ids_porta_40[id_index_zaheler].id == NULL) {
 						continue;
 					}
-					// Überprüfen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
+					// Ueberpruefen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
 					else if (belegte_ids_porta_40[id_index_zaheler].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüfen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfügbar, es muss also eine andere ID gesucht werden
+						// Ueberpruefen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfuegbar, es muss also eine andere ID gesucht werden
 						if (belegte_ids_porta_40[id_index_zaheler].positions_id_voll == 1) {
 							available = 0;
 						}
-						// Überprüfen, ob der einzulagernde Artikel in die Resthöhe des Fachs passt, wenn ja, dann durchlaufe alles auch für die nächsten benötigten IDs
+						// Ueberpruefen, ob der einzulagernde Artikel in die Resthoehe des Fachs passt, wenn ja, dann durchlaufe alles auch fuer die naechsten benoetigten IDs
 						else if (belegte_ids_porta_40[id_index_zaheler].resthoehe >= artikel->typ->hoehe) {
 							continue;
 						}
 					}
-					// ID nicht verfügbar, suche andere ID
+					// ID nicht verfuegbar, suche andere ID
 					else {
 						available = 0;
 						break;
 					}
 				}
 
-				// Aktuelle ID (und nachfolgende) sind möglich, artikel kann an die Stelle eingelagert werden
+				// Aktuelle ID (und nachfolgende) sind moeglich, Artikel kann an die Stelle eingelagert werden
 				if (available == 1) {
-					// Für jede vom Artikel belegte ID einen struct anlegen
+					// Fuer jede vom Artikel belegte ID einen struct anlegen
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
 						double resthoehe;
 						// Hier wird die richtige ID wieder mit der Lagerkennung zusammengebaut
 						aktuelle_id = aktuelle_id_index + 24000000;
 
-						// Überprüft, ob die aktuelle ID schon als PositionsID erstellt ist
+						// Ueberprueft, ob die aktuelle ID schon als PositionsID erstellt ist
 						// Wenn nicht (== NULL), dann erstelle eine neue PositionsID
 						if (belegte_ids_porta_40[aktuelle_id_index].id == NULL) {
 							struct PositionsID positions_id;
@@ -1256,18 +1270,18 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 							positions_id.artikelnummer = artikel->typ->art_nummer;
 							positions_id.positions_id_voll = 0;
 
-							// Berechnung der Resthöhe
+							// Berechnung der Resthoehe
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_porta_40[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1275,7 +1289,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_porta_40[aktuelle_id_index];
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1284,7 +1298,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_porta_40[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1299,12 +1313,12 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 	else if (((hoehe > 40) && (hoehe <= 80)) || lager_porta_40_cm_voll == 1) {
 		start_id = START_ID_PORTA_80CM;
 
-		// Durchlaufen aller möglichen IDs für Porta 80cm Lagerplatz 
+		// Durchlaufen aller moeglichen IDs für Porta 80cm Lagerplatz 
 		for (aktuelle_id = start_id; aktuelle_id < max_anzahl_porta_80; aktuelle_id++) {
 			int available = 0;
 			i = aktuelle_id - START_ID_PORTA_80CM;
-			// Überprüfen, ob aktuelle ID schon in der Liste belegte_ids_porta_80 vorhanden ist
-			// Wenn an der Stelle i in belegte_ids_porta_80 noch kein Element vorhanden ist, wir die ID als verfügbar angesehen
+			// Ueberpruefen, ob aktuelle ID schon in der Liste belegte_ids_porta_80 vorhanden ist
+			// Wenn an der Stelle i in belegte_ids_porta_80 noch kein Element vorhanden ist, wir die ID als verfuegbar angesehen
 			if (belegte_ids_porta_80[i].id == NULL) {
 				available = 1;
 			}
@@ -1312,15 +1326,15 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 				// Vergleich, ob die aktuelle_id in belegte_ids_porta_80 vorhanden ist
 				if (belegte_ids_porta_80[i].id == aktuelle_id) {
 					// Vergleich, ob die Artikelnummer der PositionsID an der Stelle i in belegte_ids_porta_80 gleich der Artikel Nummer von dem ArtikelTyp des Artikels ist
-					// Wenn nicht, fange mit der nächsten ID neu an
+					// Wenn nicht, fange mit der naechsten ID neu an
 					if (belegte_ids_porta_80[i].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüft, ob PositionsID den Flag "voll" gesetzt hat
-						// Wenn ja, fange mit der nächsten ID neu an
+						// Ueberprueft, ob PositionsID den Flag "voll" gesetzt hat
+						// Wenn ja, fange mit der naechsten ID neu an
 						if (belegte_ids_porta_80[i].positions_id_voll == 1) {
 							continue;
 						}
-						// Überprüft, ob der Artikel von der Höhe noch in die PositionsID passt
-						// Wenn ja, dann ist diese ID Potentiell möglich
+						// Ueberprueft, ob der Artikel von der Hoehe noch in die PositionsID passt
+						// Wenn ja, dann ist diese ID potentiell moeglich
 						else if (belegte_ids_porta_80[i].resthoehe >= hoehe) {
 							available = 1;
 						}
@@ -1330,46 +1344,46 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 					}
 				}
 			}
-			// aktuelle ID ist potentiell möglich
-			// überprüfen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
+			// Aktuelle ID ist potentiell moeglich
+			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (28000000)
 				int aktuelle_id_index = aktuelle_id - 28000000;
 				int letzte_belegte_id = aktuelle_id_index + ids_von_artikel_belegt;
 				int id_index_zaheler;
-				// Durchlaufen für alle vom Artikel benötigten Positions IDs
+				// Durchlaufen fuer alle vom Artikel benötigten Positions IDs
 				for (id_index_zaheler = aktuelle_id_index; id_index_zaheler <= letzte_belegte_id; id_index_zaheler++) {
-					// Steht an der Stelle im Array überhaupt schon was?
+					// Steht an der Stelle im Array ueberhaupt schon was?
 					if (belegte_ids_porta_80[id_index_zaheler].id == NULL) {
 						continue;
 					}
-					// Überprüfen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
+					// Ueberpruefen, ob die Artikelnummer an dieser Stelle gleich der Artikelnummer des einzulagernden Artikels ist
 					else if (belegte_ids_porta_80[id_index_zaheler].artikelnummer == artikel->typ->art_nummer) {
-						// Überprüfen, ob das Fach als "voll" makiert ist, wenn nicht, dann ist diese ID nicht verfügbar, es muss also eine andere ID gesucht werden
+						// Ueberpruefen, ob das Fach als "voll" markiert ist, wenn nicht, dann ist diese ID nicht verfuegbar, es muss also eine andere ID gesucht werden
 						if (belegte_ids_porta_80[id_index_zaheler].positions_id_voll == 1) {
 							available = 0;
 						}
-						// Überprüfen, ob der einzulagernde Artikel in die Resthöhe des Fachs passt, wenn ja, dann durchlaufe alles auch für die nächsten benötigten IDs
+						// Ueberpruefen, ob der einzulagernde Artikel in die Resthoehe des Fachs passt, wenn ja, dann durchlaufe alles auch fuer die naechsten benoetigten IDs
 						else if (belegte_ids_porta_80[id_index_zaheler].resthoehe >= artikel->typ->hoehe) {
 							continue;
 						}
 					}
-					// ID nicht verfügbar, suche andere ID
+					// ID nicht verfuegbar, suche andere ID
 					else {
 						available = 0;
 						break;
 					}
 				}
 
-				// Aktuelle ID (und nachfolgende) sind möglich, artikel kann an die Stelle eingelagert werden
+				// Aktuelle ID (und nachfolgende) sind moeglich, Artikel kann an die Stelle eingelagert werden
 				if (available == 1) {
-					// Für jede vom Artikel belegte ID einen struct anlegen
+					// Fuer jede vom Artikel belegte ID einen struct anlegen
 					for (aktuelle_id_index; aktuelle_id_index < letzte_belegte_id; aktuelle_id_index++) {
 						double resthoehe;
 						// Hier wird die richtige ID wieder mit der Lagerkennung zusammengebaut
 						aktuelle_id = aktuelle_id_index + 28000000;
 
-						// Überprüft, ob die aktuelle ID schon als PositionsID erstellt ist
+						// Ueberprueft, ob die aktuelle ID schon als PositionsID erstellt ist
 						// Wenn nicht (== NULL), dann erstelle eine neue PositionsID
 						if (belegte_ids_porta_80[aktuelle_id_index].id == NULL) {
 							struct PositionsID positions_id;
@@ -1377,18 +1391,18 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 							positions_id.artikelnummer = artikel->typ->art_nummer;
 							positions_id.positions_id_voll = 0;
 
-							// Berechnung der Resthöhe
+							// Berechnung der Resthoehe
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_porta_80[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1396,7 +1410,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_porta_80[aktuelle_id_index];
 
-							// Wenn Resthöhe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1405,7 +1419,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 
 							// PositionsID als belegt Kennzeichnen
 							belegte_ids_porta_80[aktuelle_id_index] = positions_id;
-							// Anzahl der PositionsIDs, die für diesen Artikel verwendet wurden
+							// Anzahl der PositionsIDs, die fuer diesen Artikel verwendet wurden
 							artikel->anzahl_positions_ids++;
 							// Zuweisung der PositionsID an den Artikel
 							artikel->positions[artikel->anzahl_positions_ids - 1] = positions_id;
@@ -1416,7 +1430,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 			}
 		}
 	}
-	// Rückgabe eines ungültigen Wertes, falls keine passende Position gefunden wurde
+	// Rueckgabe eines ungueltigen Wertes, falls keine passende Position gefunden wurde
 	return -1;
 }
 
@@ -1425,7 +1439,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 int print_zugeordnete_ids(struct Artikel *artikel) {
 	int i;
 	bs_loeschen();
-	printf("Eingelagerter Artikel:\n");
+	printf("Eingelagerter Artikel:\n");	// noch Name hinzufuegen?
 	printf("Artikelnummer: %d\n", artikel->typ->art_nummer);
 	printf("Inventarnummer: %d\n", artikel->inventarnummer);
 	printf("Anzahl der zugeordneten IDs: %d\n", artikel->anzahl_positions_ids);
@@ -1436,7 +1450,7 @@ int print_zugeordnete_ids(struct Artikel *artikel) {
 	}
 }
 
-// Funktion zum leeren der Konsolenausgabe
+// Funktion zum Leeren der Konsolenausgabe
 void bs_loeschen(void) {
 	system("CLS");
 }
@@ -1464,7 +1478,7 @@ void strtrim(char* str) {
 	// Nullterminator setzen
 	str[end + 1] = '\0';
 
-	// Zeichenkette verschieben, wenn nötig
+	// Zeichenkette verschieben, wenn noetig
 	if (start > 0) {
 		memmove(str, str + start, end - start + 2);
 	}
