@@ -1536,7 +1536,7 @@ int artikel_aus_lager_entfernen() {
 	int lagerort_des_artikel = 0;
 	int hoehe_des_artikels = 0;
 	int belegte_positions_ids[60];
-	struct Artikel *gefundener_artikel = 0;
+	struct Artikel* gefundener_artikel = 0;
 	int erste_ziffer_1_gefunden = 0; // Flagge fuer Finden ID mit erster Ziffer 1
 	int erste_ziffer_2_gefunden = 0;
 
@@ -1570,10 +1570,10 @@ int artikel_aus_lager_entfernen() {
 
 				// Isoliere die erste Ziffer der Zahl
 				int erste_zahl = erste_ziffer(belegte_positions_ids[0]);	//Test, erste Id ueberpruefen reicht
-				
+
 				// Ueberpruefen, ob die erste Ziffer 1 ist
 				if (erste_zahl == 1) {
-					erste_ziffer_1_gefunden = 1; 
+					erste_ziffer_1_gefunden = 1;
 
 				}
 				// Wenn erste Ziffer 2 -> Porta Lager
@@ -1597,6 +1597,85 @@ int artikel_aus_lager_entfernen() {
 		// Isoliere die zweite Ziffer der Zahl
 		int zweite_zahl = zweite_ziffer(belegte_positions_ids[0]);
 		printf("Die zweite Ziffer ist: %d\n", zweite_zahl); //Test; ab hier dann Ueberpruefung, welche belegte_id_halle (20 oder 40) angeschaut werden soll (wenn zweite ziffer 2 -> 20, wenn 4 -> 40)
+
+		if (zweite_zahl == 2) {
+			// Benutzerbestaetigung für das Entfernen des Artikels
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
+
+			if (antwort == 0) {
+				printf("Entfernungsprozess abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+			else if (antwort != 1) {
+				printf("Ungueltige Eingabe.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+
+			// Durchsuchen von belegte_ids_halle_20[], um die entsprechende Position zu finden und deren Eigenschaften zu aendern
+			for (k = 0; k < HALLE_20; k++) {
+				for (j = 0; j < 60; j++) {
+					if (belegte_ids_halle_20[k].id == belegte_positions_ids[j]) {
+						printf("ID %d gefunden in Position %d\n", belegte_ids_halle_20[k].id, k);
+						// Entfernen der ID, indem sie auf 0 gesetzt wird
+						belegte_ids_halle_20[k].id = 0;
+						printf("ID %d gefunden in Position %d\n", belegte_ids_halle_20[k].id, k);
+						while (getchar() != '\n');
+						getchar();
+
+						// Berechnen der neuen Resthoehe
+						belegte_ids_halle_20[k].resthoehe += hoehe_des_artikels;
+						printf("Neue Resthoehe fuer Position %d: %d\n", k, belegte_ids_halle_20[k].resthoehe);
+
+						// Ueberpruefen, ob Resthoehe 20 betraegt und die Artikelnummer loeschen
+						if (belegte_ids_halle_20[k].resthoehe == 20) {
+							belegte_ids_halle_20[k].artikelnummer = 0;	
+							printf("Artikelnummer fuer %d: %d", k, belegte_ids_halle_20[k].artikelnummer);
+						}
+
+						belegte_ids_halle_20[k].positions_id_voll = 0;
+						printf("\nPositions Ids an Stelle %d voll = %d", k, belegte_ids_halle_20[k].positions_id_voll);
+
+						gelagerte_artikel_liste[k].inventarnummer = 0; //geht das so?
+						printf("\nInventarnummer %d", gelagerte_artikel_liste[k].inventarnummer);
+						// Setzt Anzahl der Positions-IDs auf 0
+						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
+						printf("\nArtikel mit der Inventarnummer %d erfolgreich entfernt.\n", inventarnummer);
+
+						printf("Anzahl Artikel im Lager %d", gelagerte_artikel_liste[k].typ->artikel_davon_im_lager);
+						
+						
+
+						while (getchar() != '\n');
+						getchar();
+						break;
+					
+					}
+				}
+			}	gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
+				printf("Anzahl Artikel im Lager %d", gelagerte_artikel_liste[k].typ->artikel_davon_im_lager);
+				printf("\nArtikel erfolgreich aus Lager entfernt.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+		} 
+		else if (zweite_zahl == 4) {
+			for (k = 0; k < HALLE_40; k++) {
+				for (j = 0; j < 60; j++) {
+					if (belegte_ids_halle_40[k].id == belegte_positions_ids[j]) {
+						printf("!!??!!!!");	//Test
+						while (getchar() != '\n');
+						getchar();
+
+						break;
+					}
+				}
+			}
+		}
 	}
 	if (erste_ziffer_2_gefunden) {
 		// Aktionen ausfuehren, wenn ID mit erster Ziffer 2 gefunden wurde (Porta) -> jetzt auf zweite Ziffern pruefen
@@ -1604,33 +1683,63 @@ int artikel_aus_lager_entfernen() {
 		// Isoliere die zweite Ziffer der Zahl
 		int zweite_zahl = zweite_ziffer(belegte_positions_ids[0]);
 		printf("Die zweite Ziffer ist: %d\n", zweite_zahl); //Test; ab hier dann Ueberpruefung, welche belegte_id_porta (20, 40 oder 80) angeschaut werden soll
+
+		if (zweite_zahl == 2) {
+			// Durchsuchen von belegte_ids_porta_20[], um die entsprechende Position zu finden und deren Eigenschaften zu aendern
+			for (k = 0; k < PORTA_20; k++) {
+				for (j = 0; j < 60; j++) {
+					if (belegte_ids_porta_20[k].id == belegte_positions_ids[j]) {
+						printf("????");	//Test
+						while (getchar() != '\n');
+						getchar();
+
+						break;
+					}
+				}
+			}
+		}
+		else if (zweite_zahl == 4) {
+			for (k = 0; k < PORTA_40; k++) {
+				for (j = 0; j < 60; j++) {
+					if (belegte_ids_porta_40[k].id == belegte_positions_ids[j]) {
+						printf("????!!!");	//Test
+						while (getchar() != '\n');
+						getchar();
+
+						break;
+					}
+				}
+			}
+		}
+		else if (zweite_zahl == 8) {
+			for (k = 0; k < PORTA_80; k++) {
+				for (j = 0; j < 60; j++) {
+					if (belegte_ids_porta_80[k].id == belegte_positions_ids[j]) {
+						printf("!????!");	//Test
+						while (getchar() != '\n');
+						getchar();
+
+						break;
+					}
+				}
+			}
+		}
 	}
 
 
-	// Aktueller Stand: wir haben jetzt alle vom Artikel belegten IDs (Nummern davon) in belegte_positions_ids
-	// Weiteres Vorgehen:
-	// - checken in welchem Lager der Artikel liegt (lagerort_des_artikel) und machen daran fest, welche belegte_ids_[LAGERORT] wir durchsuchen müssen
-	//		- z.B. für einen 20cm Artikel in Halle -> lagerort_des_artikel = 1
-	//											   -> belegte_positions_ids[] = [12000000, 12000001]
-	//											   -> anhand der PositionsID.id können wir herausfinden, in welchem Lager er liegt (12000000 oder 14000000)
-	//			- belegte_ids_halle_20[], ob IDs da drin liegen 
-	//			- für jede Positions ID eine neue Resthöhe berechnen und dran schreiben, positions_id_voll flag auf 0 setzen und wenn PositionsID leer (also Resthöhe ist 20, 40 oder 80) ist, dann muss auch die Artikelnummer gelöscht werden (auf 0 setzen?)
-	//			  und aus belegte_ids_[LAGER] Liste entfernen
-	// - Artikel aus gelagerte_artikel_liste[] raus nehmen
-	// - vom Artikel Inventarnummer auf 0 setzen und positions[] leeren (und eventuell noch anzahl_position_ids auf 0 setzen)
-	// - An Artikeltyp artikel_davon_im_lager - 1 setzen
+		// Aktueller Stand: wir haben jetzt alle vom Artikel belegten IDs (Nummern davon) in belegte_positions_ids
+		// Weiteres Vorgehen:
+		// - checken in welchem Lager der Artikel liegt (lagerort_des_artikel) und machen daran fest, welche belegte_ids_[LAGERORT] wir durchsuchen müssen
+		//		- z.B. für einen 20cm Artikel in Halle -> lagerort_des_artikel = 1
+		//											   -> belegte_positions_ids[] = [12000000, 12000001]
+		//											   -> anhand der PositionsID.id können wir herausfinden, in welchem Lager er liegt (12000000 oder 14000000)
+		//			- belegte_ids_halle_20[], ob IDs da drin liegen 
+		//			- für jede Positions ID eine neue Resthöhe berechnen und dran schreiben, positions_id_voll flag auf 0 setzen und wenn PositionsID leer (also Resthöhe ist 20, 40 oder 80) ist, dann muss auch die Artikelnummer gelöscht werden (auf 0 setzen?)
+		//			  und aus belegte_ids_[LAGER] Liste entfernen
+		// - Artikel aus gelagerte_artikel_liste[] raus nehmen
+		// - vom Artikel Inventarnummer auf 0 setzen und positions[] leeren (und eventuell noch anzahl_position_ids auf 0 setzen)
+		// - An Artikeltyp artikel_davon_im_lager - 1 setzen
 
-	// Benutzerbestätigung für das Entfernen des Artikels
-	int antwort;
-	printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
-	scanf(" %d", &antwort);
-
-	if (antwort == 1) {
-		// Entfernen des Artikels aus dem jeweiligen Lager und Aktualisierung Positions-IDs
-	}
-	else {
-		printf("Entfernungsprozess abgebrochen.\n");
-	}
 }
 
 int erste_ziffer(int zahl) {
