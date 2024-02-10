@@ -1599,7 +1599,7 @@ int artikel_aus_lager_entfernen() {
 		printf("Die zweite Ziffer ist: %d\n", zweite_zahl); //Test; ab hier dann Ueberpruefung, welche belegte_id_halle (20 oder 40) angeschaut werden soll (wenn zweite ziffer 2 -> 20, wenn 4 -> 40)
 
 		if (zweite_zahl == 2) {
-			// Benutzerbestaetigung für das Entfernen des Artikels
+			// Benutzerbestaetigung für das Entfernen des Artikels		!!!kann man vielleicht statt fuenf Mal einmal irgendwo einbinden??
 			int antwort;
 			printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
 			scanf("%d", &antwort);
@@ -1657,26 +1657,50 @@ int artikel_aus_lager_entfernen() {
 					
 					}
 				}
-			}	gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
-				printf("Anzahl Artikel im Lager %d", gelagerte_artikel_liste[k].typ->artikel_davon_im_lager);
-				printf("\nArtikel erfolgreich aus Lager entfernt.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
-				while (getchar() != '\n');
-				getchar();
+			}	
 		} 
 		else if (zweite_zahl == 4) {
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
+
+			if (antwort == 0) {
+				printf("Entfernungsprozess abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+			else if (antwort != 1) {
+				printf("Ungueltige Eingabe.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+
 			for (k = 0; k < HALLE_40; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_halle_40[k].id == belegte_positions_ids[j]) {
-						printf("!!??!!!!");	//Test
-						while (getchar() != '\n');
-						getchar();
-
+						belegte_ids_halle_40[k].id = 0;
+						belegte_ids_halle_40[k].resthoehe += hoehe_des_artikels;
+						// Ueberpruefen, ob Resthoehe 40 betraegt und die Artikelnummer loeschen
+						if (belegte_ids_halle_40[k].resthoehe == 40) {
+							belegte_ids_halle_40[k].artikelnummer = 0;
+						}
+						belegte_ids_halle_40[k].positions_id_voll = 0;
+						gelagerte_artikel_liste[k].inventarnummer = 0;
+						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
+						
 						break;
 					}
 				}
 			}
-		}
+		}	gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
+			printf("Anzahl Artikel im Lager %d", gelagerte_artikel_liste[k].typ->artikel_davon_im_lager);
+			printf("\nArtikel erfolgreich aus Lager entfernt.\nDruecken Sie Enter, um zum Menue zurueckzukehren!"); // Test
+			while (getchar() != '\n');
+			getchar();
 	}
+
 	if (erste_ziffer_2_gefunden) {
 		// Aktionen ausfuehren, wenn ID mit erster Ziffer 2 gefunden wurde (Porta) -> jetzt auf zweite Ziffern pruefen
 		printf("Eine ID mit erster Ziffer 2 wurde gefunden.\n");
@@ -1685,13 +1709,37 @@ int artikel_aus_lager_entfernen() {
 		printf("Die zweite Ziffer ist: %d\n", zweite_zahl); //Test; ab hier dann Ueberpruefung, welche belegte_id_porta (20, 40 oder 80) angeschaut werden soll
 
 		if (zweite_zahl == 2) {
+			// Benutzerbestaetigung für das Entfernen des Artikels
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
+
+			if (antwort == 0) {
+				printf("Entfernungsprozess abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+			else if (antwort != 1) {
+				printf("Ungueltige Eingabe.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+
 			// Durchsuchen von belegte_ids_porta_20[], um die entsprechende Position zu finden und deren Eigenschaften zu aendern
 			for (k = 0; k < PORTA_20; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_porta_20[k].id == belegte_positions_ids[j]) {
-						printf("????");	//Test
-						while (getchar() != '\n');
-						getchar();
+						belegte_ids_porta_20[k].id = 0;
+						belegte_ids_porta_20[k].resthoehe += hoehe_des_artikels;
+						// Ueberpruefen, ob Resthoehe 20 betraegt und die Artikelnummer loeschen
+						if (belegte_ids_porta_20[k].resthoehe == 20) {
+							belegte_ids_porta_20[k].artikelnummer = 0;
+						}
+						belegte_ids_porta_20[k].positions_id_voll = 0;
+						gelagerte_artikel_liste[k].inventarnummer = 0;
+						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
 
 						break;
 					}
@@ -1699,12 +1747,36 @@ int artikel_aus_lager_entfernen() {
 			}
 		}
 		else if (zweite_zahl == 4) {
+			// Benutzerbestaetigung für das Entfernen des Artikels
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
+
+			if (antwort == 0) {
+				printf("Entfernungsprozess abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+			else if (antwort != 1) {
+				printf("Ungueltige Eingabe.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+
 			for (k = 0; k < PORTA_40; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_porta_40[k].id == belegte_positions_ids[j]) {
-						printf("????!!!");	//Test
-						while (getchar() != '\n');
-						getchar();
+						belegte_ids_porta_40[k].id = 0;
+						belegte_ids_porta_40[k].resthoehe += hoehe_des_artikels;
+						// Ueberpruefen, ob Resthoehe 40 betraegt und die Artikelnummer loeschen
+						if (belegte_ids_porta_40[k].resthoehe == 40) {
+							belegte_ids_porta_40[k].artikelnummer = 0;
+						}
+						belegte_ids_porta_40[k].positions_id_voll = 0;
+						gelagerte_artikel_liste[k].inventarnummer = 0;
+						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
 
 						break;
 					}
@@ -1712,18 +1784,46 @@ int artikel_aus_lager_entfernen() {
 			}
 		}
 		else if (zweite_zahl == 8) {
+			// Benutzerbestaetigung für das Entfernen des Artikels
+			int antwort;
+			printf("Moechten Sie diesen Artikel wirklich entfernen? (1 = Ja, 0 = Nein): ");
+			scanf("%d", &antwort);
+
+			if (antwort == 0) {
+				printf("Entfernungsprozess abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+			else if (antwort != 1) {
+				printf("Ungueltige Eingabe.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
+				while (getchar() != '\n');
+				getchar();
+				return; // Zurueck zum Menue
+			}
+
 			for (k = 0; k < PORTA_80; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_porta_80[k].id == belegte_positions_ids[j]) {
-						printf("!????!");	//Test
-						while (getchar() != '\n');
-						getchar();
+						belegte_ids_porta_80[k].id = 0;
+						belegte_ids_porta_80[k].resthoehe += hoehe_des_artikels;
+						// Ueberpruefen, ob Resthoehe 40 betraegt und die Artikelnummer loeschen
+						if (belegte_ids_porta_80[k].resthoehe == 40) {
+							belegte_ids_porta_80[k].artikelnummer = 0;
+						}
+						belegte_ids_porta_80[k].positions_id_voll = 0;
+						gelagerte_artikel_liste[k].inventarnummer = 0;
+						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
 
 						break;
 					}
 				}
 			}
-		}
+		}	gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
+			printf("Anzahl Artikel im Lager %d", gelagerte_artikel_liste[k].typ->artikel_davon_im_lager);
+			printf("\nArtikel erfolgreich aus Lager entfernt.\nDruecken Sie Enter, um zum Menue zurueckzukehren!"); // Test
+			while (getchar() != '\n');
+			getchar();
 	}
 
 
