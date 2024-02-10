@@ -32,6 +32,8 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel);
 int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel);
 int print_zugeordnete_ids(struct Artikel *artikel);
 int artikel_aus_lager_entfernen();
+int erste_ziffer(int zahl);
+int zweite_ziffer(int zahl);
 int vorhandene_artikel_typen_ansehen();
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
@@ -1535,12 +1537,16 @@ int artikel_aus_lager_entfernen() {
 	int hoehe_des_artikels = 0;
 	int belegte_positions_ids[60];
 	struct Artikel *gefundener_artikel = 0;
+	int erste_ziffer_1_gefunden = 0; // Flagge fuer Finden ID mit erster Ziffer 1
+	int erste_ziffer_2_gefunden = 0;
+
+	bs_loeschen();
 
 	printf("Geben Sie die Inventarnummer des zu suchenden Artikels ein: ");
 	scanf("%d", &inventarnummer);
 
 
-	printf("Gelagerter Artikel!!!: %d \n", gelagerte_artikel_liste[0].inventarnummer);
+	printf("Gelagerter Artikel!!!: %d \n", gelagerte_artikel_liste[0].inventarnummer); // !!! Hier wird immer 1001 ausgegeben; muss an jeweilige Stelle im Array; dadurch werden alle anderen Artikel nicht gefunden
 	while (getchar() != '\n');
 	getchar();
 
@@ -1561,6 +1567,19 @@ int artikel_aus_lager_entfernen() {
 		for (j = 0; j < 60; j++) {
 			if (gefundener_artikel->positions[j].id != NULL) {
 				belegte_positions_ids[j] = gefundener_artikel->positions[j].id;
+
+				// Isoliere die erste Ziffer der Zahl
+				int erste_zahl = erste_ziffer(belegte_positions_ids[0]);	//Test, erste Id ueberpruefen reicht
+				
+				// Ueberpruefen, ob die erste Ziffer 1 ist
+				if (erste_zahl == 1) {
+					erste_ziffer_1_gefunden = 1; 
+
+				}
+				// Wenn erste Ziffer 2 -> Porta Lager
+				else if (erste_zahl == 2) {
+					erste_ziffer_2_gefunden = 1;
+				}
 			}
 			else {
 				continue;
@@ -1568,8 +1587,25 @@ int artikel_aus_lager_entfernen() {
 		}
 	}
 	else {
-		printf("Artikel nicht gefunden");
+		printf("Artikel nicht gefunden. ");
 	}
+
+
+	if (erste_ziffer_1_gefunden) {
+		// Aktionen ausfuehren, wenn eine ID mit erster Ziffer 1 gefunden wurde (Halle) -> auf zweite Ziffern pruefen
+		printf("Eine ID mit erster Ziffer 1 wurde gefunden.\n");
+		// Isoliere die zweite Ziffer der Zahl
+		int zweite_zahl = zweite_ziffer(belegte_positions_ids[0]);
+		printf("Die zweite Ziffer ist: %d\n", zweite_zahl); //Test; ab hier dann Ueberpruefung, welche belegte_id_halle (20 oder 40) angeschaut werden soll (wenn zweite ziffer 2 -> 20, wenn 4 -> 40)
+	}
+	if (erste_ziffer_2_gefunden) {
+		// Aktionen ausfuehren, wenn ID mit erster Ziffer 2 gefunden wurde (Porta) -> jetzt auf zweite Ziffern pruefen
+		printf("Eine ID mit erster Ziffer 2 wurde gefunden.\n");
+		// Isoliere die zweite Ziffer der Zahl
+		int zweite_zahl = zweite_ziffer(belegte_positions_ids[0]);
+		printf("Die zweite Ziffer ist: %d\n", zweite_zahl); //Test; ab hier dann Ueberpruefung, welche belegte_id_porta (20, 40 oder 80) angeschaut werden soll
+	}
+
 
 	// Aktueller Stand: wir haben jetzt alle vom Artikel belegten IDs (Nummern davon) in belegte_positions_ids
 	// Weiteres Vorgehen:
@@ -1595,6 +1631,21 @@ int artikel_aus_lager_entfernen() {
 	else {
 		printf("Entfernungsprozess abgebrochen.\n");
 	}
+}
+
+int erste_ziffer(int zahl) {
+	while (zahl >= 10) {
+		zahl /= 10;
+	}
+	return zahl;
+}
+
+int zweite_ziffer(int zahl) {
+	while (zahl >= 100) {
+		zahl /= 10; // Teile Zahl durch 10, um letzte Ziffer zu entfernen
+	}
+	zahl %= 10; // Verbleibende Ziffer ist zweite Ziffer
+	return zahl;
 }
 
 // Funktion zum Leeren der Konsolenausgabe
