@@ -125,6 +125,8 @@ int main(void) {
 		case 6:
 			vorhandene_artikel_typen_ansehen();
 			break;
+		case 12:
+			exit(1);
 		default:
 			printf("\nFalsche Eingabe. Druecken Sie Enter und waehlen Sie eine der oben aufgelisteten Moeglichkeiten!\n");
 			while (getchar() != '\n');
@@ -159,6 +161,7 @@ int menue() {
 	printf("\n(9)   Manuelle Bestellung erzeugen");
 	printf("\n(10)  Erfasste Bestellungen versenden");
 	printf("\n(11)  Erfasste Bestellungen abbrechen");
+	printf("\n(12)  Programm beenden");
 	printf("\n");
 	printf("\nWaehle eine Auswahlmoeglichkeit:");
 	printf("\n");
@@ -218,7 +221,9 @@ double berechne_belegung_von(int lager) {
 // Anlegen eines neuen ArtikelTyps
 int neuen_artikel_typ_anlegen() {
 	struct ArtikelTyp artikeltyp;
-	artikeltyp.artikel_davon_im_lager = 0;
+	struct ArtikelTyp *artikeltyp_pntr;
+	artikeltyp_pntr = &artikeltyp;
+	artikeltyp_pntr->artikel_davon_im_lager = 0;
 	int lagerwahl = -1;
 	int wahl = 0;
 	int i;
@@ -233,13 +238,13 @@ int neuen_artikel_typ_anlegen() {
 	// Leert Eingabepuffer nach vorherigen Eingabe
 	while (getchar() != '\n');  
 	do {
-		fgets(artikeltyp.name, sizeof(artikeltyp.name), stdin); // Kann Leerzeichen/ganze Zeile einlesen
-		artikeltyp.name[strcspn(artikeltyp.name, "\n")] = '\0'; // Entfernt Zeilenumbruchzeichen am Ende der Eingabe
+		fgets(artikeltyp_pntr->name, sizeof(artikeltyp_pntr->name), stdin); // Kann Leerzeichen/ganze Zeile einlesen
+		artikeltyp_pntr->name[strcspn(artikeltyp_pntr->name, "\n")] = '\0'; // Entfernt Zeilenumbruchzeichen am Ende der Eingabe
 
-		strtrim(artikeltyp.name); // Loescht Leerzeichen hinter/vor Name
+		strtrim(artikeltyp_pntr->name); // Loescht Leerzeichen hinter/vor Name
 		int name_existiert = 0; // Ueberpruefen, ob Artikelname bereits existiert
 		for (i = 0; i < anzahl_artikel_typen; i++) {
-			if (strcmp(artikeltyp.name, artikel_typ_liste[i].name) == 0) {
+			if (strcmp(artikeltyp_pntr->name, artikel_typ_liste[i].name) == 0) {
 				printf("\nFehler: Ein Artikel mit diesem Namen existiert bereits.\nBitte geben Sie einen neuen Namen ein:\n");
 				name_existiert = 1;
 				break;
@@ -253,7 +258,7 @@ int neuen_artikel_typ_anlegen() {
 	// Eingabe Artikelnummer; Ueberpruefen, ob schon existent und ob Ganzzahl
 	while (1) {
 		printf("\nArtikel Nummer (Ganzzahl): ");
-		if (scanf("%d", &artikeltyp.art_nummer) != 1 || getchar() != '\n') {
+		if (scanf("%d", &artikeltyp_pntr->art_nummer) != 1 || getchar() != '\n') {
 			printf("Fehler: Bitte geben Sie eine gueltige Ganzzahl fuer die Artikelnummer ein.\n");
 			while (getchar() != '\n'); 
 			continue; 
@@ -262,7 +267,7 @@ int neuen_artikel_typ_anlegen() {
 		int nummer_existiert = 0;
 		// Ueberpruefen, ob Artikelnummer bereits existiert
 		for (i = 0; i < anzahl_artikel_typen; i++) {
-			if (artikeltyp.art_nummer == artikel_typ_liste[i].art_nummer) {
+			if (artikeltyp_pntr->art_nummer == artikel_typ_liste[i].art_nummer) {
 				printf("\nFehler: Artikel mit dieser Nummer existiert bereits. Bitte geben Sie eine andere Nummer ein.\n");
 				nummer_existiert = 1;
 				break; // Bricht Schleife ab, da Nummer schon existent
@@ -274,37 +279,37 @@ int neuen_artikel_typ_anlegen() {
 	}
 
 	printf("\nPreis (in EUR): ");
-	scanf("%lf", &artikeltyp.preis);
+	scanf("%lf", &artikeltyp_pntr->preis);
 
 	// Artikel Hoehe muss > 5 und <= 80 cm sein
 	do {
 		printf("\nHoehe (in cm; > 5, wenn verderblich <= 40, sonst <= 80): ");
-		scanf("%lf", &artikeltyp.hoehe);
-		if (artikeltyp.hoehe <= 5 || artikeltyp.hoehe > 80)
+		scanf("%lf", &artikeltyp_pntr->hoehe);
+		if (artikeltyp_pntr->hoehe <= 5 || artikeltyp_pntr->hoehe > 80)
 			printf("Fehler: Die Hoehe muss groesser als 5 cm und kleiner oder gleich 80 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
-	} while (artikeltyp.hoehe <= 5 || artikeltyp.hoehe > 80);
+	} while (artikeltyp_pntr->hoehe <= 5 || artikeltyp_pntr->hoehe > 80);
 
 	// Artikel Breite darf nicht groesser als 300cm sein
 	do {
 		printf("\nBreite (in cm; > 5, <= 300): ");
-		scanf("%lf", &artikeltyp.breite);
-		if (artikeltyp.breite <= 5 || artikeltyp.breite > 300)
+		scanf("%lf", &artikeltyp_pntr->breite);
+		if (artikeltyp_pntr->breite <= 5 || artikeltyp_pntr->breite > 300)
 			printf("Fehler: Die Breite muss groesser als 5 cm und kleiner oder gleich 300 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
-	} while (artikeltyp.breite <= 5 || artikeltyp.breite > 300);
+	} while (artikeltyp_pntr->breite <= 5 || artikeltyp_pntr->breite > 300);
 
 	// Artikel Tiefe darf nicht groesser als 120cm sein
 	do {
 		printf("\nTiefe (in cm, <= 120): ");
-		scanf("%lf", &artikeltyp.tiefe);
-		if (artikeltyp.tiefe > 120)
+		scanf("%lf", &artikeltyp_pntr->tiefe);
+		if (artikeltyp_pntr->tiefe > 120)
 			printf("Fehler: Die Tiefe darf nicht groesser als 120 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
-	} while (artikeltyp.tiefe > 120);
+	} while (artikeltyp_pntr->tiefe > 120);
 
 	// Abfrage, ob Artikel verderblich oder nicht (Entscheidung in welches Lager der Artikel geht)
 	do {
 		printf("\nWeisen Sie dem Artikel nun noch zu, ob er verderblich ist oder nicht.\nVerderblich: (1)\nNicht verderblich: (2)\n");
 		scanf("%d", &lagerwahl);
-		if (artikeltyp.hoehe > 40 && lagerwahl == HALLE) {
+		if (artikeltyp_pntr->hoehe > 40 && lagerwahl == HALLE) {
 			printf("Fehler: Artikel mit einer Hoehe ueber 40 cm koennen nicht in Halle an der Saale eingelagert werden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
 			while (getchar() != '\n');
 			getchar();
@@ -318,16 +323,16 @@ int neuen_artikel_typ_anlegen() {
 	switch (lagerwahl) {
 	case HALLE:
 		// Artikel ist verderblich, Lagerort entsprechend festlegen und verarbeiten
-		halle_lager.artikel_typ_liste[halle_lager.anzahl_artikel_typen] = artikeltyp;
+		halle_lager.artikel_typ_liste[halle_lager.anzahl_artikel_typen] = *artikeltyp_pntr;
 		halle_lager.anzahl_artikel_typen++;
-		artikeltyp.lager = 1;
+		artikeltyp_pntr->lager = 1;
 		printf("\nDer Artikel wurde erfolgreich in Halle an der Saale angelegt.\nDruecken Sie Enter, um fortzufahren.\n");
 		break;
 	case PORTA_WESTFALICA:
 		// Artikel ist nicht verderblich, Lagerort entsprechend festlegen und verarbeiten
-		porta_lager.artikel_typ_liste[porta_lager.anzahl_artikel_typen] = artikeltyp;
+		porta_lager.artikel_typ_liste[porta_lager.anzahl_artikel_typen] = *artikeltyp_pntr;
 		porta_lager.anzahl_artikel_typen++;
-		artikeltyp.lager = 2;
+		artikeltyp_pntr->lager = 2;
 		printf("\nDer Artikel wurde erfolgreich in Porta Westfalica angelegt.\nDruecken Sie Enter, um fortzufahren.\n");
 		break;
 	default:
@@ -341,15 +346,15 @@ int neuen_artikel_typ_anlegen() {
 	bs_loeschen();
 	printf("Artikel wurde erfolgreich angelegt. Druecke Enter, um zum Menue zu kommen!");
 	printf("\n");
-	printf("\nArtikel Name: %s", artikeltyp.name);
-	printf("\nArtikel Nummer: %d", artikeltyp.art_nummer);
-	printf("\nArtikel Preis: %.2lf", artikeltyp.preis);
-	printf("\nArtikel Hoehe (in cm): %.2lf", artikeltyp.hoehe);
-	printf("\nArtikel Breite (in cm): %.2lf", artikeltyp.breite);
-	printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp.tiefe);
+	printf("\nArtikel Name: %s", artikeltyp_pntr->name);
+	printf("\nArtikel Nummer: %d", artikeltyp_pntr->art_nummer);
+	printf("\nArtikel Preis: %.2lf", artikeltyp_pntr->preis);
+	printf("\nArtikel Hoehe (in cm): %.2lf", artikeltyp_pntr->hoehe);
+	printf("\nArtikel Breite (in cm): %.2lf", artikeltyp_pntr->breite);
+	printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp_pntr->tiefe);
 
 	// Hinzufuegen des neuen Artikels zur Liste
-	artikel_typ_liste[anzahl_artikel_typen] = artikeltyp;
+	artikel_typ_liste[anzahl_artikel_typen] = *artikeltyp_pntr;
 	anzahl_artikel_typen++;
 
 	while (getchar() != '\n');
@@ -824,6 +829,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 		if (lagere_artikel_an_positions_ids_Halle(artikel_pntr) != -1) {
 			print_zugeordnete_ids(artikel_pntr); // Ausgabe der zugeordneten IDs
 			artikel_pntr->typ->artikel_davon_im_lager++;
+			lager_aktualisieren(artikel_pntr->typ);
 			for (j = 0; j < MAX_ARTIKEL; j++) {
 				if (gelagerte_artikel_liste[j].inventarnummer == 0) {
 					gelagerte_artikel_liste[j] = *artikel_pntr;
@@ -845,6 +851,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 		if (lagere_artikel_an_positions_ids_Porta(artikel_pntr) != -1) {
 			print_zugeordnete_ids(artikel_pntr); // Ausgabe der zugeordneten IDs
 			artikel_pntr->typ->artikel_davon_im_lager++;
+			lager_aktualisieren(artikel_pntr->typ);
 			for (j = 0; j < MAX_ARTIKEL; j++) {
 				if (gelagerte_artikel_liste[j].inventarnummer == 0) {
 					gelagerte_artikel_liste[j] = *artikel_pntr;
