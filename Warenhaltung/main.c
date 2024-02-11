@@ -1807,7 +1807,7 @@ int artikel_aus_lager_entfernen() {
 					if (belegte_ids_porta_80[k].id == belegte_positions_ids[j]) {
 						belegte_ids_porta_80[k].id = 0;
 						belegte_ids_porta_80[k].resthoehe += hoehe_des_artikels;
-						// Ueberpruefen, ob Resthoehe 40 betraegt und die Artikelnummer loeschen
+						// Ueberpruefen, ob Resthoehe 80 betraegt und die Artikelnummer loeschen
 						if (belegte_ids_porta_80[k].resthoehe == 40) {
 							belegte_ids_porta_80[k].artikelnummer = 0;
 						}
