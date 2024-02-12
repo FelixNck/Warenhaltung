@@ -35,6 +35,7 @@ int artikel_aus_lager_entfernen(int inventarnummer);
 int erste_ziffer(int zahl);
 int zweite_ziffer(int zahl);
 int vorhandene_artikel_typen_ansehen();
+int lager_zufaellig_befuellen();
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
 void strtrim(char* str);    // Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
@@ -124,6 +125,9 @@ int main(void) {
 			break;
 		case 6:
 			vorhandene_artikel_typen_ansehen();
+			break;
+		case 7:
+			lager_zufaellig_befuellen();
 			break;
 		case 12:
 			exit(1);
@@ -732,6 +736,37 @@ int vorhandene_artikel_typen_ansehen() {
 	printf("\n\nDruecke Enter, um zum Hauptmenue zurueckzukehren.");
 	while (getchar() != '\n');
 	getchar();
+}
+
+int lager_zufaellig_befuellen() {
+	int lagerwahl;
+	int anzahl_artikel;
+
+	bs_loeschen();
+
+	printf("Welches Lager moechten Sie zufaellig befuellen?\n");
+	printf("1. Halle\n");
+	printf("2. Porta Westfalica\n");
+	scanf("%d", &lagerwahl);
+
+	switch (lagerwahl) {
+	case 1:
+		printf("Wie viele Artikel moechten Sie in das Lager eingelagern?\n");
+		scanf("%d", &anzahl_artikel);
+		break;
+	case 2:
+		printf("Wie viele Artikel moechten Sie in das Lager eingelagern?\n");
+		scanf("%d", &anzahl_artikel);
+		break;
+	default:
+		printf("Ungueltige Auswahl. Druecken Sie Enter, um zum Menue zurueckzukehren!\n");
+		while (getchar() != '\n');
+		getchar();
+		return -1; 
+	}
+
+	return 0; 
+
 }
 
 // Aktualisierung der Aenderungen am Artikel im Lager
