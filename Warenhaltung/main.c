@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define HALLE_20 18000	// Vorhandene Anzahl Positions IDs für 20cm hohe Fächer
 #define HALLE_40 54000
@@ -167,7 +168,7 @@ int menue() {
 	printf("\n(11)  Erfasste Bestellungen abbrechen");
 	printf("\n(12)  Programm beenden");
 	printf("\n");
-	printf("\nWaehle eine Auswahlmoeglichkeit:");
+	printf("\nWaehlen Sie eine Auswahlmoeglichkeit:");
 	printf("\n");
 	
 	return 0;
@@ -741,6 +742,11 @@ int vorhandene_artikel_typen_ansehen() {
 int lager_zufaellig_befuellen() {
 	int lagerwahl;
 	int anzahl_artikel;
+	int i; 
+
+	srand(time(NULL));
+
+	//jeweilige Lagerliste aufrufen, aus dieser zufaellig Artikel waehlen und einlagern
 
 	bs_loeschen();
 
@@ -749,14 +755,34 @@ int lager_zufaellig_befuellen() {
 	printf("2. Porta Westfalica\n");
 	scanf("%d", &lagerwahl);
 
+	// Ueberpruefen, ob Artikeltypen im ausgewaehlten Lager vorhanden sind
+	if ((lagerwahl == 1 && halle_lager.anzahl_artikel_typen <= 0) ||
+		(lagerwahl == 2 && porta_lager.anzahl_artikel_typen <= 0)) {
+		printf("Fehler: Die Lagerliste enthaelt keine Artikeltypen. Druecken Sie Enter, um zum Menue zurueckzukehren!\n");
+		while (getchar() != '\n');
+		getchar();
+		return -1;
+	}
+
 	switch (lagerwahl) {
 	case 1:
 		printf("Wie viele Artikel moechten Sie in das Lager eingelagern?\n");
 		scanf("%d", &anzahl_artikel);
+		
+		for (i = 0; i < anzahl_artikel; i++) {
+			int zufallsindex = rand() % halle_lager.anzahl_artikel_typen;	// Zufaelligen Artikel per Index waehlen
+
+		}
+
 		break;
 	case 2:
 		printf("Wie viele Artikel moechten Sie in das Lager eingelagern?\n");
 		scanf("%d", &anzahl_artikel);
+
+		for (i = 0; i < anzahl_artikel; i++) {
+
+		}
+
 		break;
 	default:
 		printf("Ungueltige Auswahl. Druecken Sie Enter, um zum Menue zurueckzukehren!\n");
