@@ -307,38 +307,63 @@ int neuen_artikel_typ_anlegen() {
 			break;
 	}
 
-	printf("\nPreis (in EUR): ");
-	scanf("%lf", &artikeltyp_pntr->preis);
+	// Eingabe Preis in Euro und Ueberpruefung auf Doublewert
+	while (1) {
+		printf("\nPreis (in EUR): ");
+		if (scanf("%lf", &artikeltyp_pntr->preis) != 1 || artikeltyp_pntr->preis <= 0 || getchar() != '\n') {
+			printf("Fehler: Bitte geben Sie einen gueltigen Preis als Dezimalzahl groesser als 0 ein.\n");
+			while (getchar() != '\n');
+			continue;
+		}
+		break;
+	}
 
 	// Artikel Hoehe muss > 5 und <= 80 cm sein
-	do {
+	// Eingabe der Höhe als Double
+	while (1) {
 		printf("\nHoehe (in cm; > 5, wenn verderblich <= 40, sonst <= 80): ");
-		scanf("%lf", &artikeltyp_pntr->hoehe);
-		if (artikeltyp_pntr->hoehe <= 5 || artikeltyp_pntr->hoehe > 80)
+		if (scanf("%lf", &artikeltyp_pntr->hoehe) != 1 || artikeltyp_pntr->hoehe <= 5 || artikeltyp_pntr->hoehe > 80 || getchar() != '\n') {
 			printf("Fehler: Die Hoehe muss groesser als 5 cm und kleiner oder gleich 80 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
-	} while (artikeltyp_pntr->hoehe <= 5 || artikeltyp_pntr->hoehe > 80);
+			while (getchar() != '\n');
+			continue;
+		}
+		break;
+	}
 
 	// Artikel Breite darf nicht groesser als 300cm sein
-	do {
+	// Eingabe der Breite als Double
+	while (1) {
 		printf("\nBreite (in cm; > 5, <= 300): ");
-		scanf("%lf", &artikeltyp_pntr->breite);
-		if (artikeltyp_pntr->breite <= 5 || artikeltyp_pntr->breite > 300)
-			printf("Fehler: Die Breite muss groesser als 5 cm und kleiner oder gleich 300 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
-	} while (artikeltyp_pntr->breite <= 5 || artikeltyp_pntr->breite > 300);
+		if (scanf("%lf", &artikeltyp_pntr->breite) != 1 || artikeltyp_pntr->breite <= 5 || artikeltyp_pntr->breite > 300 || getchar() != '\n') {
+			printf("Fehler: Die Breite muss groesser als 5 cm und kleiner oder gleich 300 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+			while (getchar() != '\n');
+			continue;
+		}
+		break;
+	}
 
 	// Artikel Tiefe darf nicht groesser als 120cm sein
-	do {
+	// Eingabe der Tiefe als Double
+	while (1) {
 		printf("\nTiefe (in cm, <= 120): ");
-		scanf("%lf", &artikeltyp_pntr->tiefe);
-		if (artikeltyp_pntr->tiefe > 120)
-			printf("Fehler: Die Tiefe darf nicht groesser als 120 cm sein. Geben Sie bitte einen gueltigen Wert ein!\n");
-	} while (artikeltyp_pntr->tiefe > 120);
+		if (scanf("%lf", &artikeltyp_pntr->tiefe) != 1 || artikeltyp_pntr->tiefe > 120 || getchar() != '\n') {
+			printf("Fehler: Die Tiefe darf nicht groesser als 120 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+			while (getchar() != '\n');
+			continue;
+		}
+		break;
+	}
 
 	// Abfrage, ob Artikel verderblich oder nicht (Entscheidung in welches Lager der Artikel geht)
 	do {
 		printf("\nWeisen Sie dem Artikel nun noch zu, ob er verderblich ist oder nicht.\nVerderblich: (1)\nNicht verderblich: (2)\n");
-		scanf("%d", &lagerwahl);
-		if (artikeltyp_pntr->hoehe > 40 && lagerwahl == HALLE) {
+		if (scanf("%d", &lagerwahl) != 1 || (lagerwahl != 1 && lagerwahl != 2)) {
+			printf("Fehler: Ungueltige Eingabe. Bitte waehlen Sie eine der angegebenen Optionen (1 oder 2).\n");
+			while (getchar() != '\n');
+			continue; 
+		}
+
+		if (artikeltyp_pntr->hoehe > 40 && lagerwahl == HALLE){
 			printf("Fehler: Artikel mit einer Hoehe ueber 40 cm koennen nicht in Halle an der Saale eingelagert werden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
 			while (getchar() != '\n');
 			getchar();
