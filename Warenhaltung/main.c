@@ -261,13 +261,13 @@ int neuen_artikel_typ_anlegen() {
 			break;
 	} while (1);
 
-	// Eingabe Artikelnummer; Ueberpruefen, ob schon existent und ob Ganzzahl
+	// Eingabe Artikelnummer; Ueberpruefen, ob schon existent, ob Ganzzahl und ob > 0
 	while (1) {
-		printf("\nArtikel Nummer (Ganzzahl): ");
-		if (scanf("%d", &artikeltyp_pntr->art_nummer) != 1 || getchar() != '\n') {
-			printf("Fehler: Bitte geben Sie eine gueltige Ganzzahl fuer die Artikelnummer ein.\n");
-			while (getchar() != '\n'); 
-			continue; 
+		printf("\nArtikel Nummer (Ganzzahl > 0): ");
+		if (scanf("%d", &artikeltyp_pntr->art_nummer) != 1 || artikeltyp_pntr->art_nummer <= 0 || getchar() != '\n') {
+			printf("Fehler: Bitte geben Sie eine gueltige Ganzzahl groesser als 0 fuer die Artikelnummer ein.\n");
+			while (getchar() != '\n');
+			continue;
 		}
 
 		int nummer_existiert = 0;
@@ -753,10 +753,17 @@ int lager_zufaellig_befuellen() {
 
 	bs_loeschen();
 
-	printf("Welches Lager moechten Sie zufaellig befuellen?\n");
-	printf("\n(1) HALLE Lager");
-	printf("\n(2) PORTA WESTFALICA Lager\n");
-	scanf("%d", &lagerwahl);
+	while (1) {
+		printf("Welches Lager moechten Sie zufaellig befuellen?\n");
+		printf("\n(1) HALLE Lager");
+		printf("\n(2) PORTA WESTFALICA Lager\n");
+		if (scanf("%d", &lagerwahl) != 1 || (lagerwahl != 1 && lagerwahl != 2)) {
+			printf("Fehler: Bitte treffen Sie eine gueltige Auswahl (1 oder 2).\n");
+			while (getchar() != '\n');
+			continue;
+		}
+		break;
+	}
 
 	// Ueberpruefen, ob Artikeltypen im ausgewaehlten Lager vorhanden sind
 	if ((lagerwahl == 1 && halle_lager.anzahl_artikel_typen == 0) ||
@@ -1760,15 +1767,21 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 			for (k = 0; k < HALLE_40; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_halle_40[k].id == belegte_positions_ids[j]) {
-						belegte_ids_halle_40[k].id = 0;
 						belegte_ids_halle_40[k].resthoehe += hoehe_des_artikels;
 						// Ueberpruefen, ob Resthoehe 40 betraegt und die Artikelnummer loeschen
 						if (belegte_ids_halle_40[k].resthoehe == 40) {
+							belegte_ids_halle_40[k].id = 0;
 							belegte_ids_halle_40[k].artikelnummer = 0;
 						}
 						belegte_ids_halle_40[k].positions_id_voll = 0;
-						gelagerte_artikel_liste[k].inventarnummer = 0;
-						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
+
+						for (l = 0; l < MAX_ARTIKEL; l++) {
+							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+								gelagerte_artikel_liste[l].inventarnummer = 0;
+								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+								break;
+							}
+						}
 						
 						break;
 					}
@@ -1788,16 +1801,24 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 			for (k = 0; k < PORTA_20; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_porta_20[k].id == belegte_positions_ids[j]) {
-						belegte_ids_porta_20[k].id = 0;
+						// Berechnen der neuen Resthoehe
 						belegte_ids_porta_20[k].resthoehe += hoehe_des_artikels;
-						// Ueberpruefen, ob Resthoehe 20 betraegt und die Artikelnummer loeschen
+
+						// Ueberpruefen, wenn Resthoehe 20 betraegt dann die Artikelnummer loeschen
 						if (belegte_ids_porta_20[k].resthoehe == 20) {
+							belegte_ids_porta_20[k].id = 0; // Entfernen der ID aus belegte_ids_porta_20, indem ID von PositionsID auf 0 gesetzt wird
 							belegte_ids_porta_20[k].artikelnummer = 0;
 						}
 						belegte_ids_porta_20[k].positions_id_voll = 0;
-						gelagerte_artikel_liste[k].inventarnummer = 0;
-						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
 
+						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+						for (l = 0; l < MAX_ARTIKEL; l++) {
+							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+								gelagerte_artikel_liste[l].inventarnummer = 0;
+								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+								break;
+							}
+						}
 						break;
 					}
 				}
@@ -1807,16 +1828,24 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 			for (k = 0; k < PORTA_40; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_porta_40[k].id == belegte_positions_ids[j]) {
-						belegte_ids_porta_40[k].id = 0;
+						// Berechnen der neuen Resthoehe
 						belegte_ids_porta_40[k].resthoehe += hoehe_des_artikels;
-						// Ueberpruefen, ob Resthoehe 40 betraegt und die Artikelnummer loeschen
+
+						// Ueberpruefen, wenn Resthoehe 20 betraegt dann die Artikelnummer loeschen
 						if (belegte_ids_porta_40[k].resthoehe == 40) {
+							belegte_ids_porta_40[k].id = 0; // Entfernen der ID aus belegte_ids_porta_40, indem ID von PositionsID auf 0 gesetzt wird
 							belegte_ids_porta_40[k].artikelnummer = 0;
 						}
 						belegte_ids_porta_40[k].positions_id_voll = 0;
-						gelagerte_artikel_liste[k].inventarnummer = 0;
-						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
 
+						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+						for (l = 0; l < MAX_ARTIKEL; l++) {
+							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+								gelagerte_artikel_liste[l].inventarnummer = 0;
+								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+								break;
+							}
+						}
 						break;
 					}
 				}
@@ -1826,16 +1855,24 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 			for (k = 0; k < PORTA_80; k++) {
 				for (j = 0; j < 60; j++) {
 					if (belegte_ids_porta_80[k].id == belegte_positions_ids[j]) {
-						belegte_ids_porta_80[k].id = 0;
+						// Berechnen der neuen Resthoehe
 						belegte_ids_porta_80[k].resthoehe += hoehe_des_artikels;
-						// Ueberpruefen, ob Resthoehe 80 betraegt und die Artikelnummer loeschen
-						if (belegte_ids_porta_80[k].resthoehe == 40) {
+
+						// Ueberpruefen, wenn Resthoehe 20 betraegt dann die Artikelnummer loeschen
+						if (belegte_ids_porta_80[k].resthoehe == 80) {
+							belegte_ids_porta_80[k].id = 0; // Entfernen der ID aus belegte_ids_porta_80, indem ID von PositionsID auf 0 gesetzt wird
 							belegte_ids_porta_80[k].artikelnummer = 0;
 						}
 						belegte_ids_porta_80[k].positions_id_voll = 0;
-						gelagerte_artikel_liste[k].inventarnummer = 0;
-						gelagerte_artikel_liste[k].anzahl_positions_ids = 0;
 
+						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+						for (l = 0; l < MAX_ARTIKEL; l++) {
+							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+								gelagerte_artikel_liste[l].inventarnummer = 0;
+								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+								break;
+							}
+						}
 						break;
 					}
 				}
