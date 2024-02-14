@@ -41,7 +41,7 @@ int vorhandene_artikel_typen_ansehen();
 int lager_zufaellig_befuellen();
 int manuelle_bestellung_anlegen();
 int zufaellige_bestellung_anlegen();
-int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert);
+int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, int anzahl_artikel);
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
 void strtrim(char* str);    // Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
