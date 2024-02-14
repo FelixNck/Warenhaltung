@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#define HALLE_20 18000	// Vorhandene Anzahl Positions IDs für 20cm hohe Fächer
+#define HALLE_20 18000	// Vorhandene Anzahl Positions IDs für 20cm hohe Faecher
 #define HALLE_40 54000
 #define PORTA_20 34800
 #define PORTA_40 6000
@@ -28,7 +28,7 @@ int neuen_artikel_typ_anlegen();
 int artikel_typ_bearbeiten();
 int details_waehlen_bearbeitung(struct ArtikelTyp* artikel);
 int artikel_typ_loeschen();
-int atikel_manuell_erfassen();
+int artikel_manuell_erfassen();
 int artikel_erfassen(int artikelnummer, struct ArtikelTyp *artikel_typ_pntr, int ausgabe_aktiviert);
 int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel artikel, int ausgabe_aktiviert);
 int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel);
@@ -44,7 +44,7 @@ int zufaellige_bestellung_anlegen();
 int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, int anzahl_artikel);
 int lager_aktualisieren(struct ArtikelTyp *artikel);
 void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
-void strtrim(char* str);    // Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
+void strtrim(char* str); // Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
 
 // Kennzeichnet eine 10cm Breite und 60cm Tiefe Position im Lager
 struct PositionsID {
@@ -54,7 +54,7 @@ struct PositionsID {
 	int artikelnummer; // Artikelnummer des ArtikelTypen an dieser Position
 };
 
-// Viele Artikel gehören einem Typen an
+// Viele Artikel gehoeren einem Typen an
 struct ArtikelTyp {
 	char name[100];
 	int art_nummer; // Eindeutige Kennzeichnung des ArtikelTypen
@@ -98,8 +98,8 @@ struct Lager porta_lager;
 
 // Enumeration, gibt HALLE Wert 1 und PW Wert 2
 enum LagerTyp {
-	HALLE = 1,  // Verderblich
-	PORTA_WESTFALICA = 2    // Nicht verderblich
+	HALLE = 1, // Verderblich
+	PORTA_WESTFALICA = 2 // Nicht verderblich
 };
 
 // Anzahl der bereits vorhandenen ArtikelTypen
@@ -119,6 +119,7 @@ int main(void) {
 	halle_lager.anzahl_artikel_typen = 0;
 	porta_lager.anzahl_artikel_typen = 0;
 
+	// Menue zum Waehlen der Aktion
 	while (1) {
 		menue();
 		auswahl = 0;
@@ -135,7 +136,7 @@ int main(void) {
 			artikel_typ_loeschen();
 			break;
 		case 4:
-			atikel_manuell_erfassen();
+			artikel_manuell_erfassen();
 			break;
 		case 6:
 			vorhandene_artikel_typen_ansehen();
@@ -171,7 +172,7 @@ int menue() {
 	printf("\n40cm: %.2lf %%\t\t40cm: %.2lf %%", berechne_belegung_von(2), berechne_belegung_von(3));
 	printf("\n\t\t\t80cm: %.2lf %%", berechne_belegung_von(4));
 	printf("\n");
-	printf("\nWarenausgang: %d", berechne_artikel_im_warenausgang());
+	printf("\nWarenausgang: %d", berechne_artikel_im_warenausgang()); // Anzahl aller Artikel im Warenausgang
 	printf("\n");
 	printf("\n(1)   Neuen Artikeltyp anlegen");
 	printf("\n(2)   Artikeltyp bearbeiten");
@@ -205,7 +206,7 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / HALLE_20;
 		break;
-	case 1: // Prozentberechnung fuer Porta WF 20cm
+	case 1: // Prozentberechnung fuer PW 20cm
 		for (i = 0; i < PORTA_20; i++) {
 			if (belegte_ids_porta_20[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -221,7 +222,7 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / HALLE_40;
 		break;
-	case 3: // Prozentberechnung fuer Porta WF 40cm
+	case 3: // Prozentberechnung fuer PW 40cm
 		for (i = 0; i < PORTA_40; i++) {
 			if (belegte_ids_porta_40[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -229,7 +230,7 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / PORTA_40;
 		break;
-	case 4: // Prozentberechnung fuer Porta WF 80cm
+	case 4: // Prozentberechnung fuer PW 80cm
 		for (i = 0; i < PORTA_80; i++) {
 			if (belegte_ids_porta_80[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -241,6 +242,7 @@ double berechne_belegung_von(int lager) {
 	return prozent;
 }
 
+// Artikelanzahl im Warenausgang berechnen
 int berechne_artikel_im_warenausgang() {
 	int i;
 	int anzahl_artikel_im_warenausgang = 0;
@@ -335,7 +337,7 @@ int neuen_artikel_typ_anlegen() {
 		break;
 	}
 
-	// Artikel Breite darf nicht groesser als 300cm sein
+	// Artikel Breite darf nicht groesser als 300 cm sein
 	// Eingabe der Breite als Double
 	while (1) {
 		printf("\nBreite (in cm; > 5, <= 300): ");
@@ -347,7 +349,7 @@ int neuen_artikel_typ_anlegen() {
 		break;
 	}
 
-	// Artikel Tiefe darf nicht groesser als 120cm sein
+	// Artikel Tiefe darf nicht groesser als 120 cm sein
 	// Eingabe der Tiefe als Double
 	while (1) {
 		printf("\nTiefe (in cm, <= 120): ");
@@ -381,7 +383,7 @@ int neuen_artikel_typ_anlegen() {
 
 	switch (lagerwahl) {
 	case HALLE:
-		// Artikel ist verderblich, Lagerort entsprechend festlegen und verarbeiten
+		// Artikel ist verderblich, Lagerort Halle
 		artikeltyp_pntr->lager = 1;
 		halle_lager.artikel_typ_liste[halle_lager.anzahl_artikel_typen] = *artikeltyp_pntr;
 		halle_lager.anzahl_artikel_typen++;
@@ -389,7 +391,7 @@ int neuen_artikel_typ_anlegen() {
 		printf("\nDer Artikel wurde erfolgreich in Halle an der Saale angelegt.\nDruecken Sie Enter, um fortzufahren.\n");
 		break;
 	case PORTA_WESTFALICA:
-		// Artikel ist nicht verderblich, Lagerort entsprechend festlegen und verarbeiten
+		// Artikel ist nicht verderblich, Lagerort PW
 		artikeltyp_pntr->lager = 2;
 		porta_lager.artikel_typ_liste[porta_lager.anzahl_artikel_typen] = *artikeltyp_pntr;
 		porta_lager.anzahl_artikel_typen++;
@@ -405,7 +407,8 @@ int neuen_artikel_typ_anlegen() {
 	getchar();
 
 	bs_loeschen();
-	printf("Artikel wurde erfolgreich angelegt. Druecke Enter, um zum Menue zu kommen!");
+	// Angelegten Artikeltypen anzeigen
+	printf("Artikeltyp wurde erfolgreich angelegt. Druecke Enter, um zum Menue zu kommen!");
 	printf("\n");
 	printf("\nArtikel Name: %s", artikeltyp_pntr->name);
 	printf("\nArtikel Nummer: %d", artikeltyp_pntr->art_nummer);
@@ -414,7 +417,7 @@ int neuen_artikel_typ_anlegen() {
 	printf("\nArtikel Breite (in cm): %.2lf", artikeltyp_pntr->breite);
 	printf("\nArtikel Tiefe (in cm): %.2lf", artikeltyp_pntr->tiefe);
 
-	// Hinzufuegen des neuen Artikels zur Liste
+	// Hinzufuegen des neuen Artikels zur Artikeltyp-Liste
 	artikel_typ_liste[anzahl_artikel_typen] = *artikeltyp_pntr;
 	anzahl_artikel_typen++;
 
@@ -433,9 +436,10 @@ int artikel_typ_bearbeiten() {
 	int i;
 
 	bs_loeschen();
-	printf("Artikel Typ bearbeiten");
-	printf("\n");
-	printf("\nMoechten Sie den Artikel anhand der Artikelnummer (1) oder des Namens (2) suchen?\n");
+	printf("Artikeltyp bearbeiten\n");
+
+	// Eingabe Artikelnummer oder Name
+	printf("\nMoechten Sie den Artikeltyp anhand der Artikelnummer (1) oder des Namens (2) suchen?\nUm zum Menue zurueckzukehren (3)\n");
 	scanf("%d", &auswahl);
 
 	switch (auswahl) {
@@ -443,7 +447,7 @@ int artikel_typ_bearbeiten() {
 		printf("\nBitte geben Sie die Artikelnummer ein: ");
 		scanf("%d", &suchnummer);
 		for (i = 0; i < anzahl_artikel_typen; i++) {
-			// Artikel in Artikelliste anhand Artikelnummer finden
+			// Artikel in Artikeltyp-Liste anhand Artikelnummer finden
 			if (artikel_typ_liste[i].art_nummer == suchnummer) {
 				printf("\nArtikel gefunden:\n");
 				printf("\nArtikel Name: %s", artikel_typ_liste[i].name);
@@ -454,12 +458,13 @@ int artikel_typ_bearbeiten() {
 				printf("\nArtikel Tiefe (in cm): %.2lf", artikel_typ_liste[i].tiefe);
 				printf("\n");
 
-				// Code für Aenderung Details des Artikels
+				// Funktion fuer Aenderung Details des Artikels
 				details_waehlen_bearbeitung(&artikel_typ_liste[i]);
 				gefunden = 1;
 				break;
 			}
 		}
+		// Fehlerausgabe, wenn Artikelnummer nicht existiert
 		if (!gefunden) {
 			printf("\nEin Artikel mit dieser Nummer wurde nicht gefunden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 			while (getchar() != '\n');
@@ -474,7 +479,7 @@ int artikel_typ_bearbeiten() {
 		suchname[strcspn(suchname, "\n")] = 0; // Entfernen des Zeilenumbruchs
 		strtrim(suchname);
 		for (i = 0; i < anzahl_artikel_typen; i++) {
-			// Artikel in Artikelliste anhand Artikelname finden
+			// Artikel in Artikeltyp-Liste anhand Artikelname finden
 			if (strcmp(artikel_typ_liste[i].name, suchname) == 0) {
 				printf("\nArtikel gefunden:\n");
 				printf("\nArtikel Name: %s", artikel_typ_liste[i].name);
@@ -485,20 +490,25 @@ int artikel_typ_bearbeiten() {
 				printf("\nArtikel Tiefe (in cm): %.2lf", artikel_typ_liste[i].tiefe);
 				printf("\n");
 
-				// Code für die Aenderung Details Artikel
+				// Funktion fuer die Aenderung Details Artikel
 				details_waehlen_bearbeitung(&artikel_typ_liste[i]);
 				gefunden = 1;
 				break;
 			}
 		}
+		// Fehlerausgabe, wenn Artikelname nicht existiert
 		if (!gefunden) {
 			printf("\nEin Artikel mit diesem Namen wurde nicht gefunden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 			while (getchar() != '\n');
 			getchar();
 		}
 		break;
+	case 3:
+		break;
 	default:
-		printf("\nUngueltige Auswahl.");
+		printf("\nUngueltige Auswahl. Druecken Sie Enter, um zum Menue zurueckzukehren!");
+		while (getchar() != '\n');
+		getchar();
 		break;
 	}
 
@@ -512,6 +522,7 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 	int i;
 
 	do {
+		// Wahl der bearbeitbaren Werte
 		printf("\nWelches Detail moechten Sie bearbeiten?");
 		printf("\n(1) Name");
 		printf("\n(2) Artikelnummer");
@@ -521,12 +532,13 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 		scanf("%d", &auswahl);
 		switch (auswahl) {
 		case 1:
+			// Neuen Namen eingeben
 			printf("\nBitte geben Sie den neuen Namen ein: ");
 			getchar();
 			fgets(temp_artikel.name, sizeof(temp_artikel.name), stdin); // Einlesen des Namens mit Leerzeichen
 			temp_artikel.name[strcspn(temp_artikel.name, "\n")] = 0; // Entfernen des Zeilenumbruchs
 			strtrim(temp_artikel.name);
-			// Ueberpruefen, ob der Name bereits existiert
+			// Ueberpruefen, ob Name bereits existiert
 			for (i = 0; i < anzahl_artikel_typen; i++) {
 				if (strcmp(temp_artikel.name, artikel_typ_liste[i].name) == 0 && temp_artikel.art_nummer != artikel_typ_liste[i].art_nummer) {
 					printf("\nFehler: Der eingegebene Name existiert bereits in einem anderen Artikel.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
@@ -537,6 +549,7 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			}
 			break;
 		case 2:
+			// Neue Artikelnummer eingeben
 			printf("\nBitte geben Sie die neue Artikelnummer ein:\n");
 			// Ueberpruefen, ob Ganzzahl eingegeben wird
 			while (scanf("%d", &temp_artikel.art_nummer) != 1) {
@@ -555,23 +568,38 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			}
 			break;
 		case 3:
+			while(1){
+			// Neuen Preis eingeben
 			printf("\nBitte geben Sie den neuen Preis ein: ");
-			scanf("%lf", &temp_artikel.preis);
+				// Ueberpruefen, ob > 0 und double
+				if (scanf("%lf", &temp_artikel.preis) != 1 || temp_artikel.preis <= 0 || getchar() != '\n') {
+					printf("Fehler: Bitte geben Sie einen gueltigen Preis als Dezimalzahl groesser als 0 ein.\n");
+					while (getchar() != '\n');
+					continue;
+				}
+				break;
+			}
 			break;
 		default:
-			printf("\nUngueltige Auswahl.");
+			// Fehlerausgabe
+			printf("\nUngueltige Auswahl. Druecken Sie Enter, um zum Menue zurueckzukehren!");
+			while (getchar() != '\n');
+			getchar();
 			break;
 		}
 
+		// Anzeigen des bearbeiteten Artikels
 		printf("\nArtikel Name: %s", temp_artikel.name);
 		printf("\nArtikel Nummer: %d", temp_artikel.art_nummer);
 		printf("\nArtikel Preis: %.2lf", temp_artikel.preis);
 		printf("\n");
 
+		// Benutzerabfrage nach weiteren Aenderungen
 		printf("\nMoechten Sie weitere Details bearbeiten? (1 = Ja, 0 = Nein): ");
 		scanf("%d", &weitere_aenderungen);
 	} while (weitere_aenderungen);
 
+	// Benutzerabfrage ob Aenderungen speichern
 	printf("\nMoechten Sie diese Aenderungen speichern? (1 = Ja, 0 = Nein): ");
 	scanf("%d", &auswahl);
 	if (auswahl == 1) {
@@ -585,16 +613,19 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 	return 0;
 }
 
+// Funktion, um ganzen Artikeltypen zu loeschen
 int artikel_typ_loeschen() {
 	int i, j, k, l, m;
 	int artikel_nummer;
 
 	bs_loeschen();
+	printf("Artikeltyp loeschen\n");
 
-	printf("Geben Sie die Artikelnummer des zu loeschenden Artikels ein: ");
+	// Artikeltyp nach Nummer suchen
+	printf("\nGeben Sie die Artikelnummer des zu loeschenden Artikels ein: ");
 	scanf("%d", &artikel_nummer);
 
-	// Sucht nach dem Artikel in den Lagerlisten und loescht ihn, wenn j
+	// Sucht nach dem Artikel in den Lagerlisten und loescht ihn
 	for (i = 0; i < halle_lager.anzahl_artikel_typen; i++) {
 		if (halle_lager.artikel_typ_liste[i].art_nummer == artikel_nummer) {
 			// Artikel gefunden, zeigt die Details an
@@ -637,6 +668,7 @@ int artikel_typ_loeschen() {
 							if (artikel_aus_lager_entfernen(gelagerte_artikel_liste[m].inventarnummer) == 0) {
 								continue;
 							}
+							// Fehlerausgabe, wenn Artikel nicht gefunden
 							else if (artikel_aus_lager_entfernen(gelagerte_artikel_liste[m].inventarnummer) == -1) {
 								printf("Artikel nicht gefunden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 								while (getchar() != '\n');
@@ -650,13 +682,14 @@ int artikel_typ_loeschen() {
 					}
 					
 				}
-
+				// Erfolgreich geloescht
 				printf("Artikel erfolgreich geloescht.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 				while (getchar() != '\n');
 				getchar();
 				return 0;
 			}
 			else {
+				// Wenn Artikel nicht geloescht werden soll (Antwort 0)
 				printf("Loeschvorgang abgebrochen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 				while (getchar() != '\n');
 				getchar();
@@ -699,7 +732,7 @@ int artikel_typ_loeschen() {
 					}
 				}
 
-				// Durchsuche alle Artikel und loesche alle von diesem ArtikelTyp
+				// Durchsuche alle Artikel und loesche alle von diesem Artikeltyp
 				for (m = 0; m < MAX_ARTIKEL; m++) {
 					// Ueberspringe Stellen in gelagerte_artikel_liste, wo kein Artikel liegt
 					if (gelagerte_artikel_liste[m].typ != NULL) {
@@ -707,6 +740,7 @@ int artikel_typ_loeschen() {
 							if (artikel_aus_lager_entfernen(gelagerte_artikel_liste[m].inventarnummer) == 0) {
 								continue;
 							}
+							// Fehlerausgabe, wenn Artikel nicht gefunden
 							else if (artikel_aus_lager_entfernen(gelagerte_artikel_liste[m].inventarnummer) == -1) {
 								printf("Artikel nicht gefunden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 								while (getchar() != '\n');
@@ -720,7 +754,6 @@ int artikel_typ_loeschen() {
 					}
 
 				}
-
 				printf("Artikel erfolgreich geloescht.\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 				while (getchar() != '\n');
 				getchar();
@@ -741,13 +774,16 @@ int artikel_typ_loeschen() {
 }
 
 
-// Funktion zum Anzeigen der vorhandenen Artikel und gleichzeitigen Aktualisierung des Lagerbestands
+// Funktion zum Anzeigen der vorhandenen Artikeltypen und gleichzeitigen Aktualisierung des Lagerbestands
 int vorhandene_artikel_typen_ansehen() {
 	int lagerwahl = 0;
 	int i;
 
 	bs_loeschen();
-	printf("Welches Lager moechten Sie anzeigen?");
+	printf("Vorhandene Artikeltypen ansehen\n");
+
+	// Wahl des Lagers
+	printf("\nWelches Lager moechten Sie anzeigen?");
 	printf("\n(1) HALLE Lager");
 	printf("\n(2) PORTA WESTFALICA Lager");
 	printf("\n");
@@ -756,7 +792,8 @@ int vorhandene_artikel_typen_ansehen() {
 
 	switch (lagerwahl) {
 	case HALLE:
-		printf("\nArtikel im HALLE Lager:\n\n");
+		// Anzeigen aller Artikeltypen in Halle
+		printf("\nArtikeltypen im HALLE Lager:\n\n");
 		for (i = 0; i < halle_lager.anzahl_artikel_typen; i++) {
 			struct ArtikelTyp *artikeltyp = &halle_lager.artikel_typ_liste[i];
 			printf("\nArtikelname: %s", artikeltyp->name);
@@ -772,7 +809,8 @@ int vorhandene_artikel_typen_ansehen() {
 		}
 		break;
 	case PORTA_WESTFALICA:
-		printf("\nArtikel im PORTA WESTFALICA Lager:\n\n");
+		// Anzeigen aller Artikeltypen in PW
+		printf("\nArtikeltypen im PORTA WESTFALICA Lager:\n\n");
 		for (i = 0; i < porta_lager.anzahl_artikel_typen; i++) {
 			struct ArtikelTyp artikeltyp = porta_lager.artikel_typ_liste[i];
 			printf("\nArtikelname: %s", artikeltyp.name);
@@ -790,11 +828,12 @@ int vorhandene_artikel_typen_ansehen() {
 		break;
 	}
 
-	printf("\n\nDruecke Enter, um zum Hauptmenue zurueckzukehren.");
+	printf("\n\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
 	while (getchar() != '\n');
 	getchar();
 }
 
+// Funktion, um Lager zufaellig mit Artikeln zu bestuecken
 int lager_zufaellig_befuellen() {
 	int lagerwahl;
 	int anzahl_artikel;
@@ -806,20 +845,24 @@ int lager_zufaellig_befuellen() {
 	srand(time(NULL));
 
 	bs_loeschen();
+	printf("Lager zufaellig befuellen\n");
 
+	// Fehlerausgabe, wenn keine Artikeltypen angelegt sind
 	if (gesamtzahl_artikel_typen == 0) {
-		printf("Fehler: Es gibt keine Artikeltypen. Erstellen Sie zuerst einen neuen Artikeltypen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
+		printf("\nFehler: Es gibt keine Artikeltypen. Erstellen Sie zuerst einen neuen Artikeltypen.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
 		while (getchar() != '\n');
 		getchar();
 		return -1;
 	}
 	
-	printf("Wie viele Artikel moechten Sie eingelagern?\n");
+	// Eingabe Anzahl einzulagernder Artikel
+	printf("\nWie viele Artikel moechten Sie eingelagern?\n");
 	scanf("%d", &anzahl_artikel);
 
 	for (i = 0; i < anzahl_artikel; i++) {
 		int zufallsindex = rand() % gesamtzahl_artikel_typen;	// Zufaelligen Artikel per Index waehlen
 		if (artikel_erfassen(artikel_typ_liste[zufallsindex].art_nummer, &artikel_typ_liste[zufallsindex], 0) == -1) {
+			// Fehlerausgabe wenn Lager voll ist
 			printf("\nArtikel vom Typ %s konnte nicht eingelagert werden. Das Lager ist voll.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n\n", artikel_typ_liste[zufallsindex].name);
 			while (getchar() != '\n');
 			getchar();
@@ -834,6 +877,7 @@ int lager_zufaellig_befuellen() {
 	return 0; 
 }
 
+// Funktion, um zufaellige Bestellung zu erfassen
 int zufaellige_bestellung_anlegen() {
 	int i, j;
 	int anzahl_artikel;
@@ -847,6 +891,7 @@ int zufaellige_bestellung_anlegen() {
 	bs_loeschen();
 
 	srand(time(NULL));
+	printf("Zufaellige Bestellung erzeugen\n");
 
 	for (i = 0; i < MAX_ARTIKEL; i++) {
 		if (gelagerte_artikel_liste[i].inventarnummer == 0) {
@@ -860,7 +905,12 @@ int zufaellige_bestellung_anlegen() {
 	anzahl_bestellbare_artikel = gesamtanzahl_artikel_im_lager - artikel_im_warenausgang;
 
 	printf("\nWaehlen Sie eine Anzahl die bestellt werden soll. (Maximale Anzahl Artikel, die bestellt werden kann ist %d): \n", anzahl_bestellbare_artikel);
-	scanf("%d", &anzahl_artikel);
+	if (scanf("%d", &anzahl_artikel) != 1 || anzahl_artikel <= 0 || getchar() != '\n'){
+		printf("\nFehler: Ungueltige Eingabe fuer die Anzahl der Artikel.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
+		while (getchar() != '\n');
+		getchar();
+		return -1;
+	}
 
 	if (anzahl_artikel > anzahl_bestellbare_artikel) {
 		printf("\nEs gibt nicht genuegend Artikel im Lager.");
@@ -872,7 +922,9 @@ int zufaellige_bestellung_anlegen() {
 
 	for (j = 0; j < anzahl_artikel; j++) {
 		do {
+			// Zufaellig Artikeltypen waehlen
 			zufallsindex = rand() % gesamtzahl_artikel_typen;
+			// Wenn kein Artikel von Artikeltyp in Lager wird naechster Artikeltyp zufaellig gewaehlt
 			while (artikel_typ_liste[zufallsindex].artikel_davon_im_lager == 0) {
 				zufallsindex = rand() % gesamtzahl_artikel_typen;
 			}
@@ -882,12 +934,12 @@ int zufaellige_bestellung_anlegen() {
 		} while (artikel_gelagert != 1);
 	}
 
-	printf("Es wurde erfolgreich eine zufaellige Bestellung mit %d Artikeln erstellt! Druecken Sie Enter, um zum Menue zurueckzukehren!\n", anzahl_artikel);
+	printf("Eine zufaellige Bestellung mit %d Artikeln wurde erfolgreich erstellt! Druecken Sie Enter, um zum Menue zurueckzukehren!\n", anzahl_artikel);
 	while (getchar() != '\n');
 	getchar();
 }
 
-// Manuelles anlegen einer Bestellung
+// Manuelles Anlegen einer Bestellung
 int manuelle_bestellung_anlegen() {
 	int i;
 	int artikelnummer;
@@ -897,9 +949,13 @@ int manuelle_bestellung_anlegen() {
 	do {
 		artikel_typ_liste[MAX_ARTIKEL_TYP];
 		bs_loeschen();
+		printf("Manuelle Bestellung erzeugen\n");
 		printf("\nVorhandene Artikeltypen: ");
+
+		// Alle vorhandenen Artikeltypen werden angezeigt
 		for (i = 0; i < MAX_ARTIKEL_TYP; i++) {
 			if (artikel_typ_liste[i].art_nummer != 0) {
+				// Wenn kein Artikel von einem Artikeltypen im Lager, wird er nicht mit angezeigt
 				if (artikel_typ_liste[i].artikel_davon_im_lager != 0) {
 					printf("\nArtikelname: %s", artikel_typ_liste[i].name);
 					printf("\nArtikelnummer: %d", artikel_typ_liste[i].art_nummer);
@@ -909,18 +965,22 @@ int manuelle_bestellung_anlegen() {
 				}
 			}
 		}
+		// Wahl der Artikelnummer zum Bestellen
 		printf("\nWaehlen Sie eine Artikelnummer aus, die Sie bestellen moechten: ");
 		scanf("%d", &artikelnummer);
 		bs_loeschen();
+
 		if (artikel_in_den_warenausgang_legen(artikelnummer, 1, 0) == -1) {
 			return -1;
 		}
-
+		// Benutzerabfrage, ob weitere Artikel bestellen
 		printf("\nMoechten Sie weitere Artikel zu der Bestellung hinzufuegen? (1 = Ja, 0 = Nein)\n");
 		scanf("%d", &weitere_artikel);
+
 	} while (weitere_artikel == 1);
 }
 
+// Funktion, um Artikel in den Warenausgang zu legen
 int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, int anzahl_artikel) {
 	int i, j;
 	int artikel_gefunden = 0;
@@ -997,7 +1057,7 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 		}
 	}
 
-	// Artikeltyp ist noch nicht im Warenausgang
+	// Artikeltyp ist noch nicht im Warenausgang, wird Liste hinzugefuegt
 	if (artikel_schon_im_warenausgang == 0) {
 		for (j = 0; j < MAX_ARTIKEL_TYP; j++) {
 			if (warenausgang[j].artikel_typ == NULL) {
@@ -1013,7 +1073,7 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 	return 0;
 }
 
-// Aktualisierung der Aenderungen am Artikel im Lager
+// Aktualisierung der Aenderungen am Artikeltyp im Lager
 int lager_aktualisieren(struct ArtikelTyp *artikel) {
 	int i;
 	for (i = 0; i < anzahl_artikel_typen; i++) {
@@ -1031,19 +1091,19 @@ int lager_aktualisieren(struct ArtikelTyp *artikel) {
 	}
 }
 
-int atikel_manuell_erfassen() {
+// Funktion, um Artikel manuell zu erfassen
+int artikel_manuell_erfassen() {
 	int gefunden = 0;
 	int eingabeNummer;
 	char wahl;
 	int i;
 
-
 	do {
 		gefunden = 0; // Zuruecksetzen des gefunden-Flags
 
 		bs_loeschen();
-
-		printf("Geben Sie die Artikelnummer ein: ");
+		printf("Artikel manuell erfassen\n");
+		printf("\nGeben Sie die Artikelnummer ein: ");
 		if (scanf("%d", &eingabeNummer) == 1) {
 			for (i = 0; i < anzahl_artikel_typen; i++) {
 				if (artikel_typ_liste[i].art_nummer == eingabeNummer) {
@@ -1094,7 +1154,7 @@ int artikel_erfassen(int artikelnummer, struct ArtikelTyp *artikel_typ_pntr, int
 
 	struct Artikel artikel;
 	artikel.typ = artikel_typ_pntr;
-	artikel.inventarnummer = generiere_inventarnummer(); // Hier wird die Inventarnummer generiert und zugewiesen;
+	artikel.inventarnummer = generiere_inventarnummer(); // Hier wird Inventarnummer generiert und zugewiesen
 
 	if (artikel_einlagern_nach_nummer(artikelnummer, artikel_typ_pntr->lager, artikel, ausgabe_aktiviert) == -1) {
 		return -1;
@@ -1103,7 +1163,7 @@ int artikel_erfassen(int artikelnummer, struct ArtikelTyp *artikel_typ_pntr, int
 }
 
 int generiere_inventarnummer() {
-	// Inkrementiere Zaehler und gib neue Inventarnummer zurück
+	// Inkrementiere Zaehler und gib neue Inventarnummer zurueck
 	return ++inventarnummerZaehler;
 }
 
@@ -1114,7 +1174,7 @@ int artikel_einlagern_nach_nummer(int artikelnummer, int lager, struct Artikel a
 	struct Artikel *artikel_pntr;
 	artikel_pntr = &artikel;
 
-	// Ueberpruefen des Lagers und Berechnungen, vielleicht als separate Funktionen nochmal
+	// Ueberpruefen des Lagers und Berechnungen
 	if (lager == 1) {
 		// Aktionen für Lager 1 (HALLE)
 		if (lagere_artikel_an_positions_ids_Halle(artikel_pntr) != -1) {
@@ -1521,7 +1581,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 				}
 			}
 			// aktuelle ID ist potentiell moeglich
-			// UEberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
+			// Ueberpruefen, ob die nachfolgenden IDs auch noch frei sind (wenn Artikel mehrere belegt)
 			if (available == 1) {
 				// Der ID Index entspricht der ID Nummer, ohne die Lagererkennung (12000000)
 				int aktuelle_id_index = aktuelle_id - 22000000;
