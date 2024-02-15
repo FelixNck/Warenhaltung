@@ -3,13 +3,12 @@
 #include <string.h>
 #include <time.h>
 
-#define HALLE_20 18000	// Vorhandene Anzahl Positions IDs für 20cm hohe Faecher
-#define HALLE_40 54000
-#define PORTA_20 34800
-#define PORTA_40 6000
-#define PORTA_80 7800
-#define MAX_ARTIKEL HALLE_20+HALLE_40+PORTA_20+PORTA_40+PORTA_80
-
+#define HALLE_20 18000 // Vorhandene Anzahl Positions IDs für 20cm hohe Faecher in Halle
+#define HALLE_40 54000 // Vorhandene Anzahl Positions IDs für 40cm hohe Faecher in Halle
+#define PORTA_20 34800 // Vorhandene Anzahl Positions IDs für 20cm hohe Faecher in PW
+#define PORTA_40 6000 // Vorhandene Anzahl Positions IDs für 40cm hohe Faecher in PW
+#define PORTA_80 7800 // Vorhandene Anzahl Positions IDs für 80cm hohe Faecher in PW
+#define MAX_ARTIKEL HALLE_20+HALLE_40+PORTA_20+PORTA_40+PORTA_80 // Maximale Anzahl Artikel die in allen Lagern zusammen gelagert werden können
 
 // StartIDs zum Zaehlen; Halle = Lager 1; PW = Lager 2
 #define START_ID_HALLE_20CM 12000000
@@ -18,7 +17,7 @@
 #define START_ID_PORTA_40CM 2400000
 #define START_ID_PORTA_80CM 2800000
 
-// Maximale Anzahl von Artikeln
+// Maximale Anzahl von Artikeltypen
 #define MAX_ARTIKEL_TYP 400
 
 int menue();
@@ -34,6 +33,7 @@ int artikel_einlagern_nach_nummer(int eingabeNummer, int lager, struct Artikel a
 int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel);
 int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel);
 int print_zugeordnete_ids(struct Artikel *artikel);
+int artikel_umraeumen();
 int artikel_aus_lager_entfernen(int inventarnummer);
 int erste_ziffer(int zahl);
 int zweite_ziffer(int zahl);
@@ -41,14 +41,16 @@ int vorhandene_artikel_typen_ansehen();
 int lager_zufaellig_befuellen();
 int manuelle_bestellung_anlegen();
 int zufaellige_bestellung_anlegen();
+int bestellungen_versenden();
+int warenausgang_leeren(int ausgabe_aktiviert);
 int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, int anzahl_artikel);
 int lager_aktualisieren(struct ArtikelTyp *artikel);
-void bs_loeschen(); // Funktion zum leeren der Konsolenausgabe
-void strtrim(char* str); // Leerzeichen am Anfang und Ende einer Eingabe ignorieren/wegschneiden
+void bs_loeschen();
+void strtrim(char* str);
 
 // Kennzeichnet eine 10cm Breite und 60cm Tiefe Position im Lager
 struct PositionsID {
-	int id;
+	int id; // Eindeutige ID dieser Position
 	int resthoehe; // Restlicher freier Platz an dieser PositionsID (nicht < 5cm)
 	int positions_id_voll; // Flag, zum Kennzeichnen, ob PositionsID voll ist
 	int artikelnummer; // Artikelnummer des ArtikelTypen an dieser Position
@@ -62,8 +64,8 @@ struct ArtikelTyp {
 	double hoehe;
 	double breite;
 	double tiefe;
-	int lager;
-	int artikel_davon_im_lager;
+	int lager; // Zuordnung zu einem Lager (Halle = 1, PW = 2)
+	int artikel_davon_im_lager; // Anzahl der Artikel von diesem Typ im Lager
 };
 
 // Ein Artikel verbraucht einen bestimmten Lagerplatz (bestimmte Anzahl an PositionsIDs)
@@ -74,27 +76,29 @@ struct Artikel {
 	int anzahl_positions_ids; // Anzahl belegter PositionsIDs
 };
 
+// Artikeltypen, die in diesem Lager zugeordnet sind inklusive Gesamtanzahl Artikeltypen
 struct Lager {
-	struct ArtikelTyp artikel_typ_liste[MAX_ARTIKEL_TYP]; // Artikel, die in diesem Lager gelagert sind
+	struct ArtikelTyp artikel_typ_liste[MAX_ARTIKEL_TYP];
 	int anzahl_artikel_typen;
 };
 
+// Artikeltypen, die im Warenausgang liegen inklusive Anzahl von diesem Typ im Warenausgang
 struct ArtikelTypImWarenausgang {
 	struct ArtikelTyp* artikel_typ;
 	int anzahl_von_diesem_typ_im_warenausgang;
 };
 
-// Liste fuer Artikel im Warenausgang
-struct ArtikelTypImWarenausgang warenausgang[MAX_ARTIKEL_TYP];
-
-// Liste fuer bereits angelegte ArtikelTypen
-struct ArtikelTyp artikel_typ_liste[MAX_ARTIKEL_TYP];
-
-// Liste fuer bereits angelegte Artikel
-struct Artikel gelagerte_artikel_liste[MAX_ARTIKEL] = { 0 };
-
+struct PositionsID belegte_ids_halle_20[HALLE_20]; // Liste fuer belegte IDs im Halle-Lager mit 20cm Hoehe
+struct PositionsID belegte_ids_halle_40[HALLE_40]; // Liste fuer belegte IDs im Halle-Lager mit 40cm Hoehe
+struct PositionsID belegte_ids_porta_20[PORTA_20]; // Liste fuer belegte IDs im Porta-Lager mit 20cm Hoehe
+struct PositionsID belegte_ids_porta_40[PORTA_40]; // Liste fuer belegte IDs im Porta-Lager mit 40cm Hoehe
+struct PositionsID belegte_ids_porta_80[PORTA_80]; // Liste fuer belegte IDs im Porta-Lager mit 80cm Hoehe
+struct ArtikelTyp artikel_typ_liste[MAX_ARTIKEL_TYP]; // Liste fuer bereits angelegte ArtikelTypen
+struct Artikel gelagerte_artikel_liste[MAX_ARTIKEL] = { 0 }; // Liste fuer bereits angelegte Artikel
 struct Lager halle_lager;
 struct Lager porta_lager;
+struct ArtikelTypImWarenausgang warenausgang[MAX_ARTIKEL_TYP]; // Liste fuer Artikel im Warenausgang
+
 
 // Enumeration, gibt HALLE Wert 1 und PW Wert 2
 enum LagerTyp {
@@ -102,15 +106,8 @@ enum LagerTyp {
 	PORTA_WESTFALICA = 2 // Nicht verderblich
 };
 
-// Anzahl der bereits vorhandenen ArtikelTypen
-int anzahl_artikel_typen = 0;
-
-int inventarnummerZaehler = 1000;
-struct PositionsID belegte_ids_halle_20[HALLE_20]; // Liste fuer belegte IDs im Halle-Lager mit 20cm Hoehe
-struct PositionsID belegte_ids_halle_40[HALLE_40]; // Liste fuer belegte IDs im Halle-Lager mit 40cm Hoehe
-struct PositionsID belegte_ids_porta_20[PORTA_20]; // Liste fuer belegte IDs im Porta-Lager mit 20cm Hoehe
-struct PositionsID belegte_ids_porta_40[PORTA_40]; // Liste fuer belegte IDs im Porta-Lager mit 40cm Hoehe
-struct PositionsID belegte_ids_porta_80[PORTA_80]; // Liste fuer belegte IDs im Porta-Lager mit 80cm Hoehe
+int anzahl_artikel_typen = 0; // Anzahl der bereits vorhandenen ArtikelTypen
+int inventarnummerZaehler = 1000; // Inventarnummer
 
 int main(void) {
 	int auswahl;
@@ -138,6 +135,9 @@ int main(void) {
 		case 4:
 			artikel_manuell_erfassen();
 			break;
+		case 5:
+			artikel_umraeumen();
+			break;
 		case 6:
 			vorhandene_artikel_typen_ansehen();
 			break;
@@ -149,6 +149,12 @@ int main(void) {
 			break;
 		case 9:
 			manuelle_bestellung_anlegen();
+			break;
+		case 10:
+			bestellungen_versenden();
+			break;
+		case 11:
+			warenausgang_leeren(1);
 			break;
 		case 12:
 			exit(1);
@@ -168,9 +174,9 @@ int menue() {
 	printf("Halle\t\t\tPorta Westfalica");
 	printf("\n%d Artikeltyp(en)\t%d Artikeltyp(en)", halle_lager.anzahl_artikel_typen, porta_lager.anzahl_artikel_typen);
 	printf("\nBelegung:\t\tBelegung:");
-	printf("\n20cm: %.2lf %%\t\t20cm: %.2lf %%", berechne_belegung_von(0), berechne_belegung_von(1));
-	printf("\n40cm: %.2lf %%\t\t40cm: %.2lf %%", berechne_belegung_von(2), berechne_belegung_von(3));
-	printf("\n\t\t\t80cm: %.2lf %%", berechne_belegung_von(4));
+	printf("\n20cm: %.2lf %%\t\t20cm: %.2lf %%", berechne_belegung_von(0), berechne_belegung_von(1)); // Belegung der Lager in Prozent
+	printf("\n40cm: %.2lf %%\t\t40cm: %.2lf %%", berechne_belegung_von(2), berechne_belegung_von(3)); // Belegung der Lager in Prozent
+	printf("\n\t\t\t80cm: %.2lf %%", berechne_belegung_von(4)); // Belegung der Lager in Prozent
 	printf("\n");
 	printf("\nWarenausgang: %d", berechne_artikel_im_warenausgang()); // Anzahl aller Artikel im Warenausgang
 	printf("\n");
@@ -193,12 +199,14 @@ int menue() {
 	return 0;
 }
 
+// Berechnet die Belegung eines Lagers in Prozent
 double berechne_belegung_von(int lager) {
 	int i;
 	double anzahl_belegter_ids = 0;
 	double prozent = 0;
 	switch (lager) {
-	case 0: // Prozentberechnung fuer Halle 20cm
+	// Prozentberechnung fuer Halle 20cm
+	case 0: 
 		for (i = 0; i < HALLE_20; i++) {
 			if (belegte_ids_halle_20[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -206,7 +214,8 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / HALLE_20;
 		break;
-	case 1: // Prozentberechnung fuer PW 20cm
+	// Prozentberechnung fuer PW 20cm
+	case 1: 
 		for (i = 0; i < PORTA_20; i++) {
 			if (belegte_ids_porta_20[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -214,7 +223,8 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / PORTA_20;
 		break;
-	case 2: // Prozentberechnung fuer Halle 40cm
+	// Prozentberechnung fuer Halle 40cm
+	case 2:
 		for (i = 0; i < HALLE_40; i++) {
 			if (belegte_ids_halle_40[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -222,7 +232,8 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / HALLE_40;
 		break;
-	case 3: // Prozentberechnung fuer PW 40cm
+	// Prozentberechnung fuer PW 40cm
+	case 3: 
 		for (i = 0; i < PORTA_40; i++) {
 			if (belegte_ids_porta_40[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -230,7 +241,8 @@ double berechne_belegung_von(int lager) {
 		}
 		prozent = anzahl_belegter_ids * 100 / PORTA_40;
 		break;
-	case 4: // Prozentberechnung fuer PW 80cm
+	// Prozentberechnung fuer PW 80cm
+	case 4: 
 		for (i = 0; i < PORTA_80; i++) {
 			if (belegte_ids_porta_80[i].id != NULL) {
 				anzahl_belegter_ids++;
@@ -274,11 +286,15 @@ int neuen_artikel_typ_anlegen() {
 	// Leert Eingabepuffer nach vorherigen Eingabe
 	while (getchar() != '\n');  
 	do {
-		fgets(artikeltyp_pntr->name, sizeof(artikeltyp_pntr->name), stdin); // Kann Leerzeichen/ganze Zeile einlesen
-		artikeltyp_pntr->name[strcspn(artikeltyp_pntr->name, "\n")] = '\0'; // Entfernt Zeilenumbruchzeichen am Ende der Eingabe
+		// Kann Leerzeichen/ganze Zeile einlesen
+		fgets(artikeltyp_pntr->name, sizeof(artikeltyp_pntr->name), stdin); 
+		// Entfernt Zeilenumbruchzeichen am Ende der Eingabe
+		artikeltyp_pntr->name[strcspn(artikeltyp_pntr->name, "\n")] = '\0'; 
 
-		strtrim(artikeltyp_pntr->name); // Loescht Leerzeichen hinter/vor Name
-		int name_existiert = 0; // Ueberpruefen, ob Artikelname bereits existiert
+		// Loescht Leerzeichen hinter/vor Name
+		strtrim(artikeltyp_pntr->name);
+		// Ueberpruefen, ob Artikelname bereits existiert
+		int name_existiert = 0; 
 		for (i = 0; i < anzahl_artikel_typen; i++) {
 			if (strcmp(artikeltyp_pntr->name, artikel_typ_liste[i].name) == 0) {
 				printf("\nFehler: Ein Artikel mit diesem Namen existiert bereits.\nBitte geben Sie einen neuen Namen ein:\n");
@@ -306,11 +322,12 @@ int neuen_artikel_typ_anlegen() {
 			if (artikeltyp_pntr->art_nummer == artikel_typ_liste[i].art_nummer) {
 				printf("\nFehler: Artikel mit dieser Nummer existiert bereits. Bitte geben Sie eine andere Nummer ein.\n");
 				nummer_existiert = 1;
-				break; // Bricht Schleife ab, da Nummer schon existent
+				// Bricht Schleife ab, da Nummer schon existent
+				break; 
 			}
 		}
-
-		if (!nummer_existiert) // Wenn eingegebene Nummer eindeutig ist
+		// Wenn eingegebene Nummer eindeutig ist
+		if (!nummer_existiert)
 			break;
 	}
 
@@ -325,36 +342,36 @@ int neuen_artikel_typ_anlegen() {
 		break;
 	}
 
-	// Artikel Hoehe muss > 5 und <= 80 cm sein
+	// Artikel Hoehe muss > 5 und <= 80cm sein
 	// Eingabe der Höhe als Double
 	while (1) {
 		printf("\nHoehe (in cm; > 5, wenn verderblich <= 40, sonst <= 80): ");
 		if (scanf("%lf", &artikeltyp_pntr->hoehe) != 1 || artikeltyp_pntr->hoehe <= 5 || artikeltyp_pntr->hoehe > 80 || getchar() != '\n') {
-			printf("Fehler: Die Hoehe muss groesser als 5 cm und kleiner oder gleich 80 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+			printf("Fehler: Die Hoehe muss groesser als 5cm und kleiner oder gleich 80cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
 			while (getchar() != '\n');
 			continue;
 		}
 		break;
 	}
 
-	// Artikel Breite darf nicht groesser als 300 cm sein
+	// Artikel Breite darf nicht groesser als 300cm sein
 	// Eingabe der Breite als Double
 	while (1) {
 		printf("\nBreite (in cm; > 5, <= 300): ");
 		if (scanf("%lf", &artikeltyp_pntr->breite) != 1 || artikeltyp_pntr->breite <= 5 || artikeltyp_pntr->breite > 300 || getchar() != '\n') {
-			printf("Fehler: Die Breite muss groesser als 5 cm und kleiner oder gleich 300 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+			printf("Fehler: Die Breite muss groesser als 5cm und kleiner oder gleich 300cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
 			while (getchar() != '\n');
 			continue;
 		}
 		break;
 	}
 
-	// Artikel Tiefe darf nicht groesser als 120 cm sein
+	// Artikel Tiefe darf nicht groesser als 120cm sein
 	// Eingabe der Tiefe als Double
 	while (1) {
 		printf("\nTiefe (in cm, <= 120): ");
 		if (scanf("%lf", &artikeltyp_pntr->tiefe) != 1 || artikeltyp_pntr->tiefe > 120 || getchar() != '\n') {
-			printf("Fehler: Die Tiefe darf nicht groesser als 120 cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
+			printf("Fehler: Die Tiefe darf nicht groesser als 120cm sein. Bitte geben Sie einen gueltigen Wert ein!\n");
 			while (getchar() != '\n');
 			continue;
 		}
@@ -371,7 +388,7 @@ int neuen_artikel_typ_anlegen() {
 		}
 
 		if (artikeltyp_pntr->hoehe > 40 && lagerwahl == HALLE){
-			printf("Fehler: Artikel mit einer Hoehe ueber 40 cm koennen nicht in Halle an der Saale eingelagert werden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
+			printf("Fehler: Artikel mit einer Hoehe ueber 40cm koennen nicht in Halle an der Saale eingelagert werden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
 			while (getchar() != '\n');
 			getchar();
 			return 0;
@@ -427,7 +444,7 @@ int neuen_artikel_typ_anlegen() {
 	return 0;
 }
 
-
+// Bearbeiten eines Artikeltyps
 int artikel_typ_bearbeiten() {
 	int auswahl;
 	char suchname[100];
@@ -475,8 +492,10 @@ int artikel_typ_bearbeiten() {
 		printf("\nBitte geben Sie den Artikelnamen ein: ");
 		while (getchar() != '\n');
 		getchar();
-		fgets(suchname, sizeof(suchname), stdin); // Einlesen des Namens mit Leerzeichen
-		suchname[strcspn(suchname, "\n")] = 0; // Entfernen des Zeilenumbruchs
+		// Einlesen des Namens mit Leerzeichen
+		fgets(suchname, sizeof(suchname), stdin); 
+		// Entfernen des Zeilenumbruchs
+		suchname[strcspn(suchname, "\n")] = 0;
 		strtrim(suchname);
 		for (i = 0; i < anzahl_artikel_typen; i++) {
 			// Artikel in Artikeltyp-Liste anhand Artikelname finden
@@ -515,6 +534,7 @@ int artikel_typ_bearbeiten() {
 	return 0;
 }
 
+// Auswahl der Eigenschaften, die bei einem Artikeltyp bearbeitet werden sollen
 int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 	int weitere_aenderungen = 1;
 	int auswahl;
@@ -794,33 +814,35 @@ int vorhandene_artikel_typen_ansehen() {
 	case HALLE:
 		// Anzeigen aller Artikeltypen in Halle
 		printf("\nArtikeltypen im HALLE Lager:\n\n");
-		for (i = 0; i < halle_lager.anzahl_artikel_typen; i++) {
-			struct ArtikelTyp *artikeltyp = &halle_lager.artikel_typ_liste[i];
-			printf("\nArtikelname: %s", artikeltyp->name);
-			printf("\nArtikelnummer: %d", artikeltyp->art_nummer);
-			printf("\nArtikelpreis: %.2lf", artikeltyp->preis);
-			printf("\nArtikelhoehe (in cm): %.2lf", artikeltyp->hoehe);
-			printf("\nArtikelbreite (in cm): %.2lf", artikeltyp->breite);
-			printf("\nArtikeltiefe (in cm): %.2lf", artikeltyp->tiefe);
-			printf("\nArtikel davon im Lager: %d", artikeltyp->artikel_davon_im_lager);
-			printf("\n");
-
-
+		for (i = 0; i < MAX_ARTIKEL_TYP; i++) {
+			if (artikel_typ_liste[i].lager == 1) {
+				struct ArtikelTyp* artikeltyp = &artikel_typ_liste[i];
+				printf("\nArtikelname: %s", artikeltyp->name);
+				printf("\nArtikelnummer: %d", artikeltyp->art_nummer);
+				printf("\nArtikelpreis: %.2lf", artikeltyp->preis);
+				printf("\nArtikelhoehe (in cm): %.2lf", artikeltyp->hoehe);
+				printf("\nArtikelbreite (in cm): %.2lf", artikeltyp->breite);
+				printf("\nArtikeltiefe (in cm): %.2lf", artikeltyp->tiefe);
+				printf("\nArtikel davon im Lager: %d", artikeltyp->artikel_davon_im_lager);
+				printf("\n");
+			}
 		}
 		break;
 	case PORTA_WESTFALICA:
 		// Anzeigen aller Artikeltypen in PW
 		printf("\nArtikeltypen im PORTA WESTFALICA Lager:\n\n");
-		for (i = 0; i < porta_lager.anzahl_artikel_typen; i++) {
-			struct ArtikelTyp artikeltyp = porta_lager.artikel_typ_liste[i];
-			printf("\nArtikelname: %s", artikeltyp.name);
-			printf("\nArtikelnummer: %d", artikeltyp.art_nummer);
-			printf("\nArtikelpreis: %.2lf", artikeltyp.preis);
-			printf("\nArtikelhoehe (in cm): %.2lf", artikeltyp.hoehe);
-			printf("\nArtikelbreite (in cm): %.2lf", artikeltyp.breite);
-			printf("\nArtikeltiefe (in cm): %.2lf", artikeltyp.tiefe);
-			printf("\nArtikel davon im Lager: %d", artikeltyp.artikel_davon_im_lager);
-			printf("\n");
+		for (i = 0; i < MAX_ARTIKEL_TYP; i++) {
+			if (artikel_typ_liste[i].lager == 2) {
+				struct ArtikelTyp* artikeltyp = &artikel_typ_liste[i];
+				printf("\nArtikelname: %s", artikeltyp->name);
+				printf("\nArtikelnummer: %d", artikeltyp->art_nummer);
+				printf("\nArtikelpreis: %.2lf", artikeltyp->preis);
+				printf("\nArtikelhoehe (in cm): %.2lf", artikeltyp->hoehe);
+				printf("\nArtikelbreite (in cm): %.2lf", artikeltyp->breite);
+				printf("\nArtikeltiefe (in cm): %.2lf", artikeltyp->tiefe);
+				printf("\nArtikel davon im Lager: %d", artikeltyp->artikel_davon_im_lager);
+				printf("\n");
+			}
 		}
 		break;
 	default:
@@ -888,11 +910,11 @@ int zufaellige_bestellung_anlegen() {
 	int anzahl_bestellbare_artikel = 0;
 	int artikel_im_warenausgang = berechne_artikel_im_warenausgang();
 	
-	bs_loeschen();
-
 	srand(time(NULL));
+	bs_loeschen();
 	printf("Zufaellige Bestellung erzeugen\n");
 
+	// Zaehlen der gesamtanzahl_artikel_im_lager
 	for (i = 0; i < MAX_ARTIKEL; i++) {
 		if (gelagerte_artikel_liste[i].inventarnummer == 0) {
 			continue;
@@ -902,6 +924,7 @@ int zufaellige_bestellung_anlegen() {
 
 	printf("\nAnzahl Artikel im Lager: %d \n", gesamtanzahl_artikel_im_lager);
 
+	// Die Anzahl bestellbarer Artikel ergibt sich aus gesamtanzahl_artikel_im_lager - artikel_im_warenausgang
 	anzahl_bestellbare_artikel = gesamtanzahl_artikel_im_lager - artikel_im_warenausgang;
 
 	printf("\nWaehlen Sie eine Anzahl die bestellt werden soll. (Maximale Anzahl Artikel, die bestellt werden kann ist %d): \n", anzahl_bestellbare_artikel);
@@ -912,6 +935,7 @@ int zufaellige_bestellung_anlegen() {
 		return -1;
 	}
 
+	// Anzahl Artikel, die bestellt werden soll, darf nicht groesser der Anzahl der bestellbaren Artikel im Lager sein
 	if (anzahl_artikel > anzahl_bestellbare_artikel) {
 		printf("\nEs gibt nicht genuegend Artikel im Lager.");
 		printf("\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
@@ -920,6 +944,7 @@ int zufaellige_bestellung_anlegen() {
 		return -1;
 	}
 
+	// Durchlaufe die Schleife je nach Anzahl zu bestellender Artikel
 	for (j = 0; j < anzahl_artikel; j++) {
 		do {
 			// Zufaellig Artikeltypen waehlen
@@ -928,13 +953,15 @@ int zufaellige_bestellung_anlegen() {
 			while (artikel_typ_liste[zufallsindex].artikel_davon_im_lager == 0) {
 				zufallsindex = rand() % gesamtzahl_artikel_typen;
 			}
+
+			// Artikel in den Warenausgang legen
 			if (artikel_in_den_warenausgang_legen(artikel_typ_liste[zufallsindex].art_nummer, 0, 1) != -1) {
 				artikel_gelagert = 1;
 			}
 		} while (artikel_gelagert != 1);
 	}
 
-	printf("Eine zufaellige Bestellung mit %d Artikeln wurde erfolgreich erstellt! Druecken Sie Enter, um zum Menue zurueckzukehren!\n", anzahl_artikel);
+	printf("Eine zufaellige Bestellung mit %d Artikeln wurde erfolgreich erstellt!\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n", anzahl_artikel);
 	while (getchar() != '\n');
 	getchar();
 }
@@ -992,9 +1019,12 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 	struct ArtikelTypImWarenausgang* artikel_typ_im_warenausgang_pntr;
 	artikel_typ_im_warenausgang_pntr = &artikel_typ_im_warenausgang;
 
+	// Durchsuchen der artikel_typ_liste nach einem Artikeltyp mit der artikelnummer
 	for (i = 0; i < MAX_ARTIKEL_TYP; i++) {
+		// Artikeltyp in artikel_typ_liste gefunden
 		if (artikel_typ_liste[i].art_nummer == artikelnummer) {
 			artikel_gefunden = 1;
+			// Von diesem Artikeltyp muessen bereits Artikel im Lager liegen
 			if (artikel_typ_liste[i].artikel_davon_im_lager != 0) {
 				artikeltyp_pntr = &artikel_typ_liste[i];
 				if (ausgabe_aktiviert == 1) {
@@ -1017,7 +1047,6 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 		}
 	}
 
-
 	if (ausgabe_aktiviert == 1) {
 		if (artikel_gefunden == 0) {
 			printf("\nDer gesuchte Artikeltyp exisitert nicht. Druecken Sie Enter, um zum Menue zurueckzukehren!\n");
@@ -1030,6 +1059,7 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 			printf("\nWaehlen Sie eine Anzahl die bestellt werden soll: ");
 			scanf("%d", &anzahl_artikel);
 
+			// Anzahl, die von diesem Artikeltyp bestellt werden soll, darf nicht groesser der Anzahl der Artikel im Lager sein
 			if (anzahl_artikel > artikeltyp_pntr->artikel_davon_im_lager) {
 				printf("\nEs gibt nicht genuegend Artikel davon im Lager! Druecken Sie Enter, um erneut die Anzahl einzugeben!");
 				while (getchar() != '\n');
@@ -1040,10 +1070,14 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 
 	artikel_typ_im_warenausgang_pntr->artikel_typ = artikeltyp_pntr;
 
+	// Durchlaufen der Liste warenausgang 
 	for (j = 0; j < MAX_ARTIKEL_TYP; j++) {
+		// Die gerade angeschaute Stelle in warenausgang darf nicht "frei" sein
 		if (warenausgang[j].artikel_typ != NULL) {
+			// Der Artikeltyp liegt bereits in der Liste warenausgang
 			if (warenausgang[j].artikel_typ->art_nummer == artikel_typ_im_warenausgang_pntr->artikel_typ->art_nummer) {
 				artikel_schon_im_warenausgang = 1;
+				// Die Gesamtanzahl der bestellten Artikel von diesem Typ darf nicht die Anzahl artikel_davon_im_lager uebersteigen
 				if (warenausgang[j].anzahl_von_diesem_typ_im_warenausgang + anzahl_artikel > artikeltyp_pntr->artikel_davon_im_lager) {
 					if (ausgabe_aktiviert == 1) {
 						printf("\nEs gibt nicht genuegend Artikel davon im Lager! Artikel kann nicht mehr so oft bestellt werden!\nDruecken Sie Enter, um zum Menue zurueckzukehren!");
@@ -1052,6 +1086,7 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 					}
 					return -1;
 				}
+				// Anzahl Artikel von diesem Tayp im Warenausgang wird erhoeht
 				warenausgang[j].anzahl_von_diesem_typ_im_warenausgang += anzahl_artikel;
 			}
 		}
@@ -1059,6 +1094,7 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 
 	// Artikeltyp ist noch nicht im Warenausgang, wird Liste hinzugefuegt
 	if (artikel_schon_im_warenausgang == 0) {
+		// Durchlaufen der Liste warenausgang und Artikeltyp an eine "freie" Stelle in der Liste legen
 		for (j = 0; j < MAX_ARTIKEL_TYP; j++) {
 			if (warenausgang[j].artikel_typ == NULL) {
 				artikel_typ_im_warenausgang_pntr->anzahl_von_diesem_typ_im_warenausgang = anzahl_artikel;
@@ -1067,8 +1103,96 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 			}
 		}
 	}
+
 	if (ausgabe_aktiviert == 1) {
 		printf("\nArtikel %s wurde dem Warenausgang %d mal hinzugefuegt!", artikeltyp_pntr->name, anzahl_artikel);
+	}
+
+	return 0;
+}
+
+// Versendet alle erfassten Bestellungen und entfernt Artikel aus dem Lager
+int bestellungen_versenden() {
+	int i, j, k;
+	int artikel_gefunden = 0;
+	int antwort;
+
+	bs_loeschen();
+	printf("Bestellungen versenden\n");
+	printf("\nWollen sie alle offenen Bestellungen versenden? (1 = Ja, 0 = Nein): \n");
+	scanf("%d", &antwort);
+
+	if (antwort == 1) {
+		// Durchlaufen des Warenausgangs
+		for (i = 0; i < MAX_ARTIKEL_TYP; i++) {
+			if (warenausgang[i].artikel_typ != NULL) {
+				// Durchlaufe es fuer die Anzahl der bestellten Artikel von diesem Typ im Warenausgang
+				for (j = 0; j < warenausgang[i].anzahl_von_diesem_typ_im_warenausgang; j++) {
+					// Durchlaufen der gelagerten_artikel_liste und ueberpruefen, ob es gelagerte Artikel von diesem Typ im Warenausgang gibt
+					for (k = 0; k < MAX_ARTIKEL; k++) {
+						// Es wurde ein Artikel von diesem Typ im Lager gefunden
+						if (gelagerte_artikel_liste[k].typ != NULL) {
+							if (gelagerte_artikel_liste[k].typ->art_nummer == warenausgang[i].artikel_typ->art_nummer) {
+								artikel_gefunden = 1;
+								// Artikel aus Lager entfernen
+								if (artikel_aus_lager_entfernen(gelagerte_artikel_liste[k].inventarnummer) == -1) {
+									printf("Der Artikel konnte nicht aus dem Lager entfernt werden!\n");
+									while (getchar() != '\n');
+									getchar();
+								}
+								break;
+							}
+						}
+					}
+					// Es konnte kein Artikel von diesem Typ im Lager gefunden werden
+					if (artikel_gefunden == 0) {
+						printf("Es konnte kein Artikel von diesem Typ im Lager gefunden werden!\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
+						warenausgang[i].artikel_typ == NULL;
+						while (getchar() != '\n');
+						getchar();
+						return -1;
+					}
+				}
+				// Artikeltyp aus Warenausgang entfernen
+				warenausgang[i].artikel_typ == NULL;
+			}
+		}
+		warenausgang_leeren(0);
+		printf("Es wurden alle Artikel erfolgreich versendet!\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n");
+		while (getchar() != '\n');
+		getchar();
+	}
+	return 0;
+}
+
+// Warenausgang wird vollstaendig geleert, um erfasste Bestellungen abzubrechen
+int warenausgang_leeren(int ausgabe_aktiviert) {
+	int i;
+	int antwort = 1;
+
+	if (ausgabe_aktiviert == 1) {
+		bs_loeschen();
+		printf("Bestellungen im Warenausgang abbrechen\n");
+		printf("\nWollen sie alle offenen Bestellungen abbrechen? (1 = Ja, 0 = Nein): \n");
+		scanf("%d", &antwort);
+	}
+
+	if (antwort == 1) {
+		// Durchlaufen der Liste warenausgang und entfernen aller derzeit darin liegenden Artikeltypen und deren bestellten Anzahl
+		for (i = 0; i < MAX_ARTIKEL_TYP; i++) {
+			if (warenausgang[i].artikel_typ != NULL) {
+				warenausgang[i].artikel_typ = NULL;
+				warenausgang[i].anzahl_von_diesem_typ_im_warenausgang = 0;
+			}
+		}
+		if (ausgabe_aktiviert == 1) {
+			printf("\nDer Warenausgang wurde vollstaendig geleert. Druecken Sie Enter, um zum Menue zurueckzukehren!\n");
+			while (getchar() != '\n');
+			getchar();
+		}
+	}
+	else {
+		return -1;
 	}
 	return 0;
 }
@@ -1076,6 +1200,7 @@ int artikel_in_den_warenausgang_legen(int artikelnummer, int ausgabe_aktiviert, 
 // Aktualisierung der Aenderungen am Artikeltyp im Lager
 int lager_aktualisieren(struct ArtikelTyp *artikel) {
 	int i;
+	// Lager Halle aktualisieren
 	for (i = 0; i < anzahl_artikel_typen; i++) {
 		if (halle_lager.artikel_typ_liste[i].art_nummer == artikel->art_nummer) {
 			halle_lager.artikel_typ_liste[i] = *artikel;
@@ -1083,6 +1208,7 @@ int lager_aktualisieren(struct ArtikelTyp *artikel) {
 		}
 	}
 
+	// Lager PW aktualisieren
 	for (i = 0; i < anzahl_artikel_typen; i++) {
 		if (porta_lager.artikel_typ_liste[i].art_nummer == artikel->art_nummer) {
 			porta_lager.artikel_typ_liste[i] = *artikel;
@@ -1094,7 +1220,7 @@ int lager_aktualisieren(struct ArtikelTyp *artikel) {
 // Funktion, um Artikel manuell zu erfassen
 int artikel_manuell_erfassen() {
 	int gefunden = 0;
-	int eingabeNummer;
+	int artikelnummer;
 	char wahl;
 	int i;
 
@@ -1104,9 +1230,11 @@ int artikel_manuell_erfassen() {
 		bs_loeschen();
 		printf("Artikel manuell erfassen\n");
 		printf("\nGeben Sie die Artikelnummer ein: ");
-		if (scanf("%d", &eingabeNummer) == 1) {
+		if (scanf("%d", &artikelnummer) == 1) {
+			// Durchlaufen der artikel_typ_liste und Suchen eines passenden Artikeltypen zu der Artikelnummer
 			for (i = 0; i < anzahl_artikel_typen; i++) {
-				if (artikel_typ_liste[i].art_nummer == eingabeNummer) {
+				// Wenn Artikeltyp gefunden wurde, dann werden seine Eigenschaften ausgegeben
+				if (artikel_typ_liste[i].art_nummer == artikelnummer) {
 					gefunden = 1;
 					printf("\nArtikeltyp gefunden:");
 					printf("\nName: %s", artikel_typ_liste[i].name);
@@ -1122,8 +1250,9 @@ int artikel_manuell_erfassen() {
 						printf("\nZurueck zum Menue...");
 						return 0;
 					}
+					// Einen Artikel von diesem Artikeltyp einlagern
 					else if (wahl == '2') {
-						if (artikel_erfassen(eingabeNummer, &artikel_typ_liste[i], 1) == -1) {
+						if (artikel_erfassen(artikelnummer, &artikel_typ_liste[i], 1) == -1) {
 							printf("\nArtikel konnte nicht eingelagert werden. Keine passende Position gefunden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n\n");
 							while (getchar() != '\n');
 							getchar();
@@ -1149,21 +1278,19 @@ int artikel_manuell_erfassen() {
 
 // Funktion zum Suchen, Anzeigen und einlagern des Artikels
 int artikel_erfassen(int artikelnummer, struct ArtikelTyp *artikel_typ_pntr, int ausgabe_aktiviert) {
-	// struct ArtikelTyp *artikel_typ_pntr;
-	// artikel_typ_pntr = &artikel_typ_liste[i];
-
 	struct Artikel artikel;
 	artikel.typ = artikel_typ_pntr;
 	artikel.inventarnummer = generiere_inventarnummer(); // Hier wird Inventarnummer generiert und zugewiesen
 
+	// Artikel anhand der Artikelnummer einlagern
 	if (artikel_einlagern_nach_nummer(artikelnummer, artikel_typ_pntr->lager, artikel, ausgabe_aktiviert) == -1) {
 		return -1;
 	}
 	return 0;
 }
 
+// Inkrementiere Zaehler und gib neue Inventarnummer zurueck
 int generiere_inventarnummer() {
-	// Inkrementiere Zaehler und gib neue Inventarnummer zurueck
 	return ++inventarnummerZaehler;
 }
 
@@ -1179,10 +1306,13 @@ int artikel_einlagern_nach_nummer(int artikelnummer, int lager, struct Artikel a
 		// Aktionen für Lager 1 (HALLE)
 		if (lagere_artikel_an_positions_ids_Halle(artikel_pntr) != -1) {
 			if (ausgabe_aktiviert == 1) {
-				print_zugeordnete_ids(artikel_pntr); // Ausgabe der zugeordneten IDs
+				// Ausgabe der zugeordneten IDs fuer den Artikel
+				print_zugeordnete_ids(artikel_pntr); 
 			}
+			// Hochzaehlen der Anzahl, die von diesem Artikeltyp im Lager ist
 			artikel_pntr->typ->artikel_davon_im_lager++;
 			lager_aktualisieren(artikel_pntr->typ);
+			// Artikel in die gelagerte_artikel_liste aufnehmen
 			for (j = 0; j < MAX_ARTIKEL; j++) {
 				if (gelagerte_artikel_liste[j].inventarnummer == 0) {
 					gelagerte_artikel_liste[j] = *artikel_pntr;
@@ -1210,10 +1340,13 @@ int artikel_einlagern_nach_nummer(int artikelnummer, int lager, struct Artikel a
 		// Aktionen für Lager 2 (PW)
 		if (lagere_artikel_an_positions_ids_Porta(artikel_pntr) != -1) {
 			if (ausgabe_aktiviert == 1) {
-				print_zugeordnete_ids(artikel_pntr); // Ausgabe der zugeordneten IDs
+				// Ausgabe der zugeordneten IDs
+				print_zugeordnete_ids(artikel_pntr);
 			}
+			// Hochzaehlen der Anzahl, die von diesem Artikeltyp im Lager ist
 			artikel_pntr->typ->artikel_davon_im_lager++;
 			lager_aktualisieren(artikel_pntr->typ);
+			// Artikel in die gelagerte_artikel_liste aufnehmen
 			for (j = 0; j < MAX_ARTIKEL; j++) {
 				if (gelagerte_artikel_liste[j].inventarnummer == 0) {
 					gelagerte_artikel_liste[j] = *artikel_pntr;
@@ -1355,7 +1488,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
@@ -1370,7 +1503,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_halle_20[aktuelle_id_index];
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1476,7 +1609,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 							double resthoehe = 40 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
@@ -1491,7 +1624,7 @@ int lagere_artikel_an_positions_ids_Halle(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_halle_40[aktuelle_id_index];
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1631,7 +1764,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
@@ -1646,7 +1779,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_porta_20[aktuelle_id_index];
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1752,7 +1885,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
@@ -1767,7 +1900,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_porta_40[aktuelle_id_index];
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1873,7 +2006,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 							double resthoehe = 20 - artikel->typ->hoehe;
 							positions_id.resthoehe = resthoehe;
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
 							}
@@ -1888,7 +2021,7 @@ int lagere_artikel_an_positions_ids_Porta(struct Artikel *artikel) {
 						else {
 							struct PositionsID positions_id = belegte_ids_porta_80[aktuelle_id_index];
 
-							// Wenn Resthoehe kleiner gleich 5 cm ist, markiere Positions-ID als voll
+							// Wenn Resthoehe kleiner gleich 5cm ist, markiere Positions-ID als voll
 							double resthoehe = positions_id.resthoehe - artikel->typ->hoehe;
 							if (resthoehe <= 5) {
 								positions_id.positions_id_voll = 1;
@@ -1927,6 +2060,28 @@ int print_zugeordnete_ids(struct Artikel *artikel) {
 	for (i = 0; i < artikel->anzahl_positions_ids; i++) {
 		printf("ID %d: %d\n", i + 1, artikel->positions[i].id);
 	}
+}
+
+// Funktion zum umraeumen von Artikeln
+int artikel_umraeumen() {
+	printf("\nDiese Funktion existiert noch nicht! Druecken Sie Enter um zum Menue zurueckzukehren!\n\n");
+	while (getchar() != '\n');
+	getchar();
+
+	// Vorschlage zum Vorgehen bei dieser Funktion:
+	//
+	// - Auswahl des Lagers in dem ein Artikel umgeraeumt werden soll
+	// - Anzeige aller Artikeltypen in dem gewaehlten Lager
+	// - Auswahl eines Artikeltypen durch Artikelnummer
+	// - Anzeige aller Artikel (mit Inventarnummer und belegten PositionsIDs) von diesem Artikeltypen
+	// - Auswahl, welcher Artikel umgeraeumt werden soll (Inventarnummer)
+	// - Auswahl neuer PositionsID (Anfangs ID, falls der Artikel mehrere belegt)
+	//		- Auswahl von PositionsIDs groesserer Faecher moeglich (aber nicht kleinerer -> Fehlerausgabe)
+	// - Ueberpruefen, ob diese ID noch frei ist (und wenn noetig auch nachfolgende) (wenn nein -> Fehlerausgabe, Auswahl neuer PositionsID)
+	// - Wenn PositionsID frei ist (und alle benoetigten nachfolgenden), dann aktualisiere PositionsIDs am Artikel
+	//		- vorher belegte PositionsIDs aus belegte_positions_id Liste (je nach Lager) entfernen und die neuen IDs hinzufuegen
+	// - Rueckgabe ueber die Konsole, ob erfolgreich
+
 }
 
 // Einen Artikel aus einem Lager entfernen
@@ -2001,19 +2156,20 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 							belegte_ids_halle_20[k].artikelnummer = 0;	
 						}
 						belegte_ids_halle_20[k].positions_id_voll = 0;
-
-						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
-						for (l = 0; l < MAX_ARTIKEL; l++) {
-							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
-								gelagerte_artikel_liste[l].inventarnummer = 0;
-								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
-								break;
-							}
-						}
 						break;
 					}
 				}
-			}	
+			}
+			// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+			for (l = 0; l < MAX_ARTIKEL; l++) {
+				if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+					gelagerte_artikel_liste[l].typ->artikel_davon_im_lager--;
+					gelagerte_artikel_liste[l].typ = NULL;
+					gelagerte_artikel_liste[l].inventarnummer = 0;
+					gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+					break;
+				}
+			}
 		} 
 		// 40cm Positions ID
 		else if (zweite_zahl == 4) {
@@ -2027,21 +2183,22 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 							belegte_ids_halle_40[k].artikelnummer = 0;
 						}
 						belegte_ids_halle_40[k].positions_id_voll = 0;
-
-						for (l = 0; l < MAX_ARTIKEL; l++) {
-							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
-								gelagerte_artikel_liste[l].inventarnummer = 0;
-								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
-								break;
-							}
-						}
-						
 						break;
 					}
 				}
 			}
+			// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+			for (l = 0; l < MAX_ARTIKEL; l++) {
+				if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+					gelagerte_artikel_liste[l].typ->artikel_davon_im_lager--;
+					gelagerte_artikel_liste[l].typ = NULL;
+					gelagerte_artikel_liste[l].inventarnummer = 0;
+					gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+					break;
+				}
+			}
 		}	
-		gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
+		//gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
 	}
 	// Lagerort ist Porta WF
 	if (erste_ziffer_2_gefunden) {
@@ -2063,17 +2220,18 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 							belegte_ids_porta_20[k].artikelnummer = 0;
 						}
 						belegte_ids_porta_20[k].positions_id_voll = 0;
-
-						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
-						for (l = 0; l < MAX_ARTIKEL; l++) {
-							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
-								gelagerte_artikel_liste[l].inventarnummer = 0;
-								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
-								break;
-							}
-						}
 						break;
 					}
+				}
+			}
+			// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+			for (l = 0; l < MAX_ARTIKEL; l++) {
+				if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+					gelagerte_artikel_liste[l].typ->artikel_davon_im_lager--;
+					gelagerte_artikel_liste[l].typ = NULL;
+					gelagerte_artikel_liste[l].inventarnummer = 0;
+					gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+					break;
 				}
 			}
 		}
@@ -2090,17 +2248,18 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 							belegte_ids_porta_40[k].artikelnummer = 0;
 						}
 						belegte_ids_porta_40[k].positions_id_voll = 0;
-
-						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
-						for (l = 0; l < MAX_ARTIKEL; l++) {
-							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
-								gelagerte_artikel_liste[l].inventarnummer = 0;
-								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
-								break;
-							}
-						}
 						break;
 					}
+				}
+			}
+			// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+			for (l = 0; l < MAX_ARTIKEL; l++) {
+				if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+					gelagerte_artikel_liste[l].typ->artikel_davon_im_lager--;
+					gelagerte_artikel_liste[l].typ = NULL;
+					gelagerte_artikel_liste[l].inventarnummer = 0;
+					gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+					break;
 				}
 			}
 		}
@@ -2117,24 +2276,26 @@ int artikel_aus_lager_entfernen(int inventarnummer) {
 							belegte_ids_porta_80[k].artikelnummer = 0;
 						}
 						belegte_ids_porta_80[k].positions_id_voll = 0;
-
-						// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
-						for (l = 0; l < MAX_ARTIKEL; l++) {
-							if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
-								gelagerte_artikel_liste[l].inventarnummer = 0;
-								gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
-								break;
-							}
-						}
 						break;
 					}
 				}
 			}
+			// Durchlaufen aller Artikel und zu loeschenden Artikel finden, um ihn aus gelagerte_artikel_liste zu entfernen
+			for (l = 0; l < MAX_ARTIKEL; l++) {
+				if (gelagerte_artikel_liste[l].inventarnummer == gefundener_artikel->inventarnummer) {
+					gelagerte_artikel_liste[l].typ->artikel_davon_im_lager--;
+					gelagerte_artikel_liste[l].typ = NULL;
+					gelagerte_artikel_liste[l].inventarnummer = 0;
+					gelagerte_artikel_liste[l].anzahl_positions_ids = 0;
+					break;
+				}
+			}
 		}
-		gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
+		//gelagerte_artikel_liste[i].typ->artikel_davon_im_lager--;
 	}
 }
 
+// Check auf die erste Ziffer einer Zahl (einer ID)
 int erste_ziffer(int zahl) {
 	while (zahl >= 10) {
 		zahl /= 10;
@@ -2142,6 +2303,7 @@ int erste_ziffer(int zahl) {
 	return zahl;
 }
 
+// Check auf die zweite Ziffer einer Zahl (einer ID)
 int zweite_ziffer(int zahl) {
 	while (zahl >= 100) {
 		zahl /= 10; // Teile Zahl durch 10, um letzte Ziffer zu entfernen
@@ -2155,6 +2317,7 @@ void bs_loeschen(void) {
 	system("CLS");
 }
 
+// Hilfsfunktionen zum entfernen von Leerzeichen aus Strings
 void strtrim(char* str) {
 	int start = 0, end;
 
