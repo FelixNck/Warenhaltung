@@ -8,7 +8,7 @@
 #define PORTA_20 34800 // Vorhandene Anzahl Positions IDs für 20cm hohe Faecher in PW
 #define PORTA_40 6000 // Vorhandene Anzahl Positions IDs für 40cm hohe Faecher in PW
 #define PORTA_80 7800 // Vorhandene Anzahl Positions IDs für 80cm hohe Faecher in PW
-#define MAX_ARTIKEL HALLE_20+HALLE_40+PORTA_20+PORTA_40+PORTA_80 // Maximale Anzahl Artikel die in allen Lagern zusammen gelagert werden können
+#define MAX_ARTIKEL HALLE_20+HALLE_40+PORTA_20+PORTA_40+PORTA_80 // Maximale Anzahl Artikel die in allen Lagern zusammen gelagert werden koennen
 
 // StartIDs zum Zaehlen; Halle = Lager 1; PW = Lager 2
 #define START_ID_HALLE_20CM 12000000
@@ -59,7 +59,7 @@ struct PositionsID {
 // Viele Artikel gehoeren einem Typen an
 struct ArtikelTyp {
 	char name[100];
-	int art_nummer; // Eindeutige Kennzeichnung des ArtikelTypen
+	int art_nummer; // Eindeutige Kennzeichnung des Artikeltypen
 	double preis;
 	double hoehe;
 	double breite;
@@ -70,7 +70,7 @@ struct ArtikelTyp {
 
 // Ein Artikel verbraucht einen bestimmten Lagerplatz (bestimmte Anzahl an PositionsIDs)
 struct Artikel {
-	struct ArtikelTyp *typ; // Verlinkung zum ArtikelTypen
+	struct ArtikelTyp *typ; // Verlinkung zum Artikeltypen
 	int inventarnummer; // Eindeutige Kennzeichnung des gelagertern Artikels
 	struct PositionsID positions[60]; // Verlinkung aller PositionsIDs, die dieser Artikel belegt (60, weil maximal 3 Meter Regale (30 IDs) und doppelseitige Belegung)
 	int anzahl_positions_ids; // Anzahl belegter PositionsIDs
@@ -93,7 +93,7 @@ struct PositionsID belegte_ids_halle_40[HALLE_40]; // Liste fuer belegte IDs im 
 struct PositionsID belegte_ids_porta_20[PORTA_20]; // Liste fuer belegte IDs im Porta-Lager mit 20cm Hoehe
 struct PositionsID belegte_ids_porta_40[PORTA_40]; // Liste fuer belegte IDs im Porta-Lager mit 40cm Hoehe
 struct PositionsID belegte_ids_porta_80[PORTA_80]; // Liste fuer belegte IDs im Porta-Lager mit 80cm Hoehe
-struct ArtikelTyp artikel_typ_liste[MAX_ARTIKEL_TYP]; // Liste fuer bereits angelegte ArtikelTypen
+struct ArtikelTyp artikel_typ_liste[MAX_ARTIKEL_TYP]; // Liste fuer bereits angelegte Artikeltypen
 struct Artikel gelagerte_artikel_liste[MAX_ARTIKEL] = { 0 }; // Liste fuer bereits angelegte Artikel
 struct Lager halle_lager;
 struct Lager porta_lager;
@@ -309,9 +309,9 @@ int neuen_artikel_typ_anlegen() {
 
 	// Eingabe Artikelnummer; Ueberpruefen, ob schon existent, ob Ganzzahl und ob > 0
 	while (1) {
-		printf("\nArtikel Nummer (Ganzzahl > 0): ");
-		if (scanf("%d", &artikeltyp_pntr->art_nummer) != 1 || artikeltyp_pntr->art_nummer <= 0 || getchar() != '\n') {
-			printf("Fehler: Bitte geben Sie eine gueltige Ganzzahl groesser als 0 fuer die Artikelnummer ein.\n");
+		printf("\nArtikel Nummer (Ganzzahl zwischen 0 und 32767 ): ");
+		if (scanf("%d", &artikeltyp_pntr->art_nummer) != 1 || artikeltyp_pntr->art_nummer <= 0 || artikeltyp_pntr->art_nummer > 32767 || getchar() != '\n') {
+			printf("Fehler: Bitte geben Sie eine gueltige Ganzzahl zwischen 0 und 32767 fuer die Artikelnummer ein.\n");
 			while (getchar() != '\n');
 			continue;
 		}
@@ -572,8 +572,8 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			// Neue Artikelnummer eingeben
 			printf("\nBitte geben Sie die neue Artikelnummer ein:\n");
 			// Ueberpruefen, ob Ganzzahl eingegeben wird
-			while (scanf("%d", &temp_artikel.art_nummer) != 1) {
-				printf("Fehler: Bitte geben Sie eine Ganzzahl fuer die Artikelnummer ein.\n");
+			while (scanf("%d", &temp_artikel.art_nummer) != 1 || temp_artikel.art_nummer <= 0 || temp_artikel.art_nummer > 32767) {
+				printf("Fehler: Bitte geben Sie eine Ganzzahl zwischen 0 und 32767 fuer die Artikelnummer ein.\n");
 				while (getchar() != '\n');
 				printf("\nBitte geben Sie die neue Artikelnummer ein: ");
 			}
@@ -605,7 +605,7 @@ int details_waehlen_bearbeitung(struct ArtikelTyp* artikel) {
 			printf("\nUngueltige Auswahl. Druecken Sie Enter, um zum Menue zurueckzukehren!");
 			while (getchar() != '\n');
 			getchar();
-			break;
+			return -1;
 		}
 
 		// Anzeigen des bearbeiteten Artikels
@@ -846,7 +846,7 @@ int vorhandene_artikel_typen_ansehen() {
 		}
 		break;
 	default:
-		printf("\nUngueltige Eingabe. Bitte waehlen Sie eine der angegebenen Optionen.");
+		printf("\nUngueltige Eingabe.");
 		break;
 	}
 
@@ -1221,7 +1221,7 @@ int lager_aktualisieren(struct ArtikelTyp *artikel) {
 int artikel_manuell_erfassen() {
 	int gefunden = 0;
 	int artikelnummer;
-	char wahl;
+	int wahl;
 	int i;
 
 	do {
@@ -1245,19 +1245,26 @@ int artikel_manuell_erfassen() {
 					printf("\nTiefe (in cm): %.2lf", artikel_typ_liste[i].tiefe);
 					printf("\nLager: %d", artikel_typ_liste[i].lager);
 					printf("\nMoechten Sie zum Menue zurueckkehren (0), nach einem anderen Artikel suchen (1) oder den Artikel einlagern (2)?:\n");
-					scanf(" %c", &wahl);
-					if (wahl == '0') {
-						printf("\nZurueck zum Menue...");
+					scanf(" %d", &wahl);
+					switch (wahl){
+					case 0:
 						return 0;
-					}
-					// Einen Artikel von diesem Artikeltyp einlagern
-					else if (wahl == '2') {
+					case 1:
+						break;
+					case 2:
+						// Einen Artikel von diesem Artikeltyp einlagern
 						if (artikel_erfassen(artikelnummer, &artikel_typ_liste[i], 1) == -1) {
 							printf("\nArtikel konnte nicht eingelagert werden. Keine passende Position gefunden.\nDruecken Sie Enter, um zum Menue zurueckzukehren!\n\n");
 							while (getchar() != '\n');
 							getchar();
 							return -1;
 						}
+						break;
+					default:
+						printf("\nUngueltige Eingabe. Druecken Sie Enter, um zum Menue zurueckzukehren!\n\n");
+						while (getchar() != '\n');
+						getchar();
+						return -1;
 					}
 				}
 			}
@@ -1269,9 +1276,22 @@ int artikel_manuell_erfassen() {
 			getchar();
 			return -1;
 		}
-		printf("Moechten Sie zum Menue zurueckkehren (0) oder einen neuen Artikel suchen (1) ?: ");
-		scanf(" %c", &wahl);
-	} while (wahl != '0');
+		if (wahl != 1) {
+			printf("Moechten Sie zum Menue zurueckkehren (0) oder einen neuen Artikel suchen (1) ?: ");
+			scanf(" %d", &wahl);
+			switch (wahl) {
+			case 0:
+				return 0;
+			case 1:
+				break;
+			default:
+				printf("\nUngueltige Eingabe. Druecken Sie Enter, um zum Menue zurueckzukehren!\n\n");
+				while (getchar() != '\n');
+				getchar();
+				return -1;
+			}
+		}
+	} while (wahl != 0);
 
 	return 0;
 }
